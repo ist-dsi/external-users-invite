@@ -1,0 +1,39 @@
+package org.fenixedu.ext.users.domain;
+
+// class definition
+
+class Invite {
+    public String name;
+    public String email;
+    public String invitationInstitution;
+    public Interval period;
+    public String reason;
+    public String idDocumentNumber;
+    public IDDocumentType idDocumentType;
+    public String originInstitutionName;
+    public String originInstitutionAddress;
+    public String contact;
+    public String contactSOS;
+}
+
+//access groups relationships definition
+
+// root relationships
+relation BennuInvite {
+    public .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
+        multiplicity 1..1;
+    }
+    public Invite playsRole invite {
+        multiplicity 0..*;
+    }
+}
+
+// class relationships
+relation UserProfileInvite {
+    public .org.fenixedu.bennu.core.domain.UserProfile playsRole userProfile {
+        multiplicity 0..1;
+    }
+    public Invite playsRole invite  {
+        multiplicity 0..*;
+    }
+ }
