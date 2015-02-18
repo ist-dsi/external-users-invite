@@ -1,6 +1,7 @@
 package org.fenixedu.ext.users.ui.bean;
 
 import org.fenixedu.academic.domain.person.IDDocumentType;
+import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.ext.users.domain.Invite;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -20,10 +21,12 @@ public class InviteBean {
     private String reason;
     private String idDocumentNumber;
     private IDDocumentType idDocumentType;
-    private String originInstitutionName;
-    private String originInstitutionAddress;
+    private String invitedInstitutionName;
+    private String invitedInstitutionAddress;
     private String contact;
     private String contactSOS;
+    private User creator;
+    private Invite invite;
 
     public String getName() {
         return name;
@@ -73,20 +76,20 @@ public class InviteBean {
         this.idDocumentType = idDocumentType;
     }
 
-    public String getOriginInstitutionName() {
-        return originInstitutionName;
+    public String getInvitedInstitutionName() {
+        return invitedInstitutionName;
     }
 
-    public void setOriginInstitutionName(String originInstitutionName) {
-        this.originInstitutionName = originInstitutionName;
+    public void setInvitedInstitutionName(String invitedInstitutionName) {
+        this.invitedInstitutionName = invitedInstitutionName;
     }
 
-    public String getOriginInstitutionAddress() {
-        return originInstitutionAddress;
+    public String getInvitedInstitutionAddress() {
+        return invitedInstitutionAddress;
     }
 
-    public void setOriginInstitutionAddress(String originInstitutionAddress) {
-        this.originInstitutionAddress = originInstitutionAddress;
+    public void setInvitedInstitutionAddress(String invitedInstitutionAddress) {
+        this.invitedInstitutionAddress = invitedInstitutionAddress;
     }
 
     public String getContact() {
@@ -110,11 +113,12 @@ public class InviteBean {
     }
 
     public DateTime getStartDateTime() {
-        return ISODateTimeFormat.dateTime().parseDateTime(startDate);
+        return startDate != null ? ISODateTimeFormat.dateTime().parseDateTime(startDate) : null;
     }
 
-    public String getStartDateFormmated() {
-        return getStartDateTime().toString("dd-MM-YYY HH:mm");
+    public String getStartDateFormatted() {
+        DateTime dateTime = getStartDateTime();
+        return dateTime != null ? dateTime.toString("dd-MM-YYY HH:mm") : null;
     }
 
     public void setStartDate(String startDate) {
@@ -130,11 +134,32 @@ public class InviteBean {
     }
 
     public DateTime getEndDateTime() {
-        return ISODateTimeFormat.dateTime().parseDateTime(endDate);
+        return endDate != null ? ISODateTimeFormat.dateTime().parseDateTime(endDate) : null;
     }
 
-    public String getEndDateFormmated() {
-        return getEndDateTime().toString("dd-MM-YYY HH:mm");
+    public String getEndDateFormatted() {
+        DateTime dateTime = getEndDateTime();
+        return dateTime != null ? dateTime.toString("dd-MM-YYY HH:mm") : null;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public String getCreatorFullName() {
+        return creator.getProfile().getFullName();
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public Invite getInvite() {
+        return invite;
+    }
+
+    public void setInvite(Invite invite) {
+        this.invite = invite;
     }
 
     public InviteBean() {
@@ -146,6 +171,8 @@ public class InviteBean {
         this.email = invite.getEmail();
         this.invitationInstitution = invite.getInvitationInstitution();
         this.reason = invite.getReason();
+        this.creator = invite.getCreator();
+        this.setInvite(invite);
 
         Interval period = invite.getPeriod();
         DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
@@ -154,8 +181,8 @@ public class InviteBean {
 
         this.idDocumentType = invite.getIdDocumentType();
         this.idDocumentNumber = invite.getIdDocumentNumber();
-        this.originInstitutionName = invite.getOriginInstitutionName();
-        this.originInstitutionAddress = invite.getOriginInstitutionAddress();
+        this.invitedInstitutionName = invite.getInvitedInstitutionName();
+        this.invitedInstitutionAddress = invite.getInvitedInstitutionAddress();
         this.contact = invite.getContact();
         this.contactSOS = invite.getContactSOS();
     }
@@ -169,10 +196,11 @@ public class InviteBean {
         private final String reason;
         private final String idDocumentNumber;
         private final IDDocumentType idDocumentType;
-        private final String originInstitutionName;
-        private final String originInstitutionAddress;
+        private final String invitedInstitutionName;
+        private final String invitedInstitutionAddress;
         private final String contact;
         private final String contactSOS;
+        private final User creator;
 
         public Builder(InviteBean inviteBean) {
 
@@ -182,11 +210,12 @@ public class InviteBean {
             this.startDate = inviteBean.getStartDate();
             this.endDate = inviteBean.getEndDate();
             this.reason = inviteBean.getReason();
+            this.creator = inviteBean.getCreator();
 
             this.idDocumentType = inviteBean.getIdDocumentType();
             this.idDocumentNumber = inviteBean.getIdDocumentNumber();
-            this.originInstitutionName = inviteBean.getOriginInstitutionName();
-            this.originInstitutionAddress = inviteBean.getOriginInstitutionAddress();
+            this.invitedInstitutionName = inviteBean.getInvitedInstitutionName();
+            this.invitedInstitutionAddress = inviteBean.getInvitedInstitutionAddress();
             this.contact = inviteBean.getContact();
             this.contactSOS = inviteBean.getContactSOS();
         }
@@ -201,8 +230,8 @@ public class InviteBean {
 
             Interval period = new Interval(startDateDT, endDateDT);
 
-            return new Invite(name, email, invitationInstitution, period, reason, idDocumentNumber, idDocumentType,
-                    originInstitutionName, originInstitutionAddress, contact, contactSOS);
+            return new Invite(creator, name, email, invitationInstitution, period, reason, idDocumentNumber, idDocumentType,
+                    invitedInstitutionName, invitedInstitutionAddress, contact, contactSOS);
         }
     }
 }

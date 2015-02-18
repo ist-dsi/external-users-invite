@@ -22,6 +22,8 @@ ${portal.toolkit()}
 <c:if test="${! empty inviteBean}">
   <form method="POST" action="${pageContext.request.contextPath}/external-users-invite/sendInvite">
 
+    <input type="hidden" class="form-control" id="creator" name="creator" value="${inviteBean.creator}"/>
+
     <div class="form-group">
       <label for="name">${name}</label>
       <input type="text" class="form-control" id="name" name="name" placeholder="${name}" required="required" value="${inviteBean.name}"/>

@@ -1,8 +1,13 @@
 package org.fenixedu.ext.users.ui.controller;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.fenixedu.academic.domain.person.IDDocumentType;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ext.users.domain.Invite;
@@ -14,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequestMapping("/external-users-invite")
 @SpringApplication(group = "logged", path = "external-users-invite", title = "title.ExternalUsersInvite")
@@ -26,6 +32,20 @@ public class ExternalUsersInviteController {
     static String BUNDLE = "resources.ExternalUsersInviteResources";
 
     @RequestMapping
+    public String listInvites(Model model, RedirectAttributes redirectAttr) {
+
+        List<Invite> invites =
+                Bennu.getInstance().getInviteSet().stream()
+                        .filter(i -> i.getCreator() != null && i.getCreator().equals(Authenticate.getUser()))
+                        .collect(Collectors.toList());
+
+        model.addAllAttributes(redirectAttr.getFlashAttributes());
+        model.addAttribute("invites", invites);
+
+        return "external-users-invite/list";
+    }
+
+    @RequestMapping(value = "/newInvite", method = RequestMethod.GET)
     public String startInvite(Model model) {
 
         InviteBean bean = new InviteBean();
@@ -35,27 +55,22 @@ public class ExternalUsersInviteController {
     }
 
     @RequestMapping(value = "/sendInvite", method = RequestMethod.POST)
-    public String sendInvite(@ModelAttribute InviteBean inviteBean, Model model) {
+    public String sendInvite(@ModelAttribute InviteBean inviteBean, RedirectAttributes redirectAttrs) {
 
-        System.out.println(inviteBean != null);
+        inviteBean.setCreator(Authenticate.getUser());
+
         //TODO: validate fields
-        /*
-         * name != null/empty
-         * email contains @ 
-         * inst != null/empty
-         * dates != null/empty && valid dates
-         * reason != null/empty
-         */
 
         Invite invite = new InviteBean.Builder(inviteBean).build();
 
         service.sendInvite(invite);
 
-        model.addAttribute(
+        redirectAttrs.addFlashAttribute(
                 "messages",
                 Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.send.successfully", new String[] { invite.getName(),
                         invite.getEmail() })));
-        return "external-users-invite/home";
+
+        return "redirect:/external-users-invite";
     }
 
     @RequestMapping(value = "/completeInvite/{oid}", method = RequestMethod.GET)
@@ -64,10 +79,58 @@ public class ExternalUsersInviteController {
         if (invite != null) {
             InviteBean inviteBean = new InviteBean(invite);
             model.addAttribute("inviteBean", inviteBean);
+            model.addAttribute("IDDocumentTypes", IDDocumentType.values());
         } else {
             model.addAttribute("error", BundleUtil.getString(BUNDLE, "error.complete.invite.not.found"));
         }
 
         return "external-users-invite/complete";
+    }
+
+    @RequestMapping(value = "/submitCompletion", method = RequestMethod.POST)
+    public String submitCompletion(InviteBean inviteBean, Model model) {
+
+        //TODO: validate fields
+        Invite invite = service.updateCompletedInvite(inviteBean);
+
+        model.addAttribute(
+                "messages",
+                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.completion.successfully", new String[] { invite
+                        .getCreator().getProfile().getFullName() })));
+
+        inviteBean = new InviteBean(invite);
+        model.addAttribute("inviteBean", inviteBean);
+
+        return "external-users-invite/complete";
+    }
+
+    @RequestMapping(value = "/inviteConfirmation/{oid}", method = RequestMethod.GET)
+    public String inviteConfirmation(@PathVariable("oid") Invite invite, Model model) {
+
+        //TODO: check creator = auth.getUser
+        //TODO: check state
+
+        InviteBean inviteBean = new InviteBean(invite);
+        model.addAttribute("inviteBean", inviteBean);
+
+        return "external-users-invite/confirm";
+    }
+
+    @RequestMapping(value = "/confirmInvite/{oid}", method = RequestMethod.GET)
+    public String confirmInvite(@PathVariable("oid") Invite invite) {
+
+        //TODO: check creator = auth.getUser
+        //TODO: check state
+
+        return "external-users-invite/confirm";
+    }
+
+    @RequestMapping(value = "/rejectInvite/{oid}", method = RequestMethod.GET)
+    public String rejectInvite(@PathVariable("oid") Invite invite) {
+
+        //TODO: check creator = auth.getUser
+        //TODO: check state
+
+        return "external-users-invite/confirm";
     }
 }

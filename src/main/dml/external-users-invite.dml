@@ -1,5 +1,10 @@
 package org.fenixedu.ext.users.domain;
 
+// enum definiton
+
+enum org.fenixedu.ext.users.domain.InviteState as InviteState;
+
+
 // class definition
 
 class Invite {
@@ -10,10 +15,11 @@ class Invite {
     public String reason;
     public String idDocumentNumber;
     public IDDocumentType idDocumentType;
-    public String originInstitutionName;
-    public String originInstitutionAddress;
+    public String invitedInstitutionName;
+    public String invitedInstitutionAddress;
     public String contact;
     public String contactSOS;
+    public InviteState state;
 }
 
 //access groups relationships definition
@@ -29,9 +35,18 @@ relation BennuInvite {
 }
 
 // class relationships
-relation UserProfileInvite {
-    public .org.fenixedu.bennu.core.domain.UserProfile playsRole userProfile {
+relation InvitedUserProfile {
+    public .org.fenixedu.bennu.core.domain.UserProfile playsRole invited {
         multiplicity 0..1;
+    }
+    public Invite playsRole invite  {
+        multiplicity 0..*;
+    }
+ }
+
+relation InviteCreator {
+    public .org.fenixedu.bennu.core.domain.User playsRole creator {
+        multiplicity 1..1;
     }
     public Invite playsRole invite  {
         multiplicity 0..*;
