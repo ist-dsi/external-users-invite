@@ -15,7 +15,8 @@
   </div>
 </c:if>
 
-<spring:message code='label.name' var='name'/>
+<spring:message code='label.given.name' var='givenName'/>
+<spring:message code='label.family.names' var='familyNames'/>
 <spring:message code='label.email' var='email'/>
 <spring:message code='label.invited.institution.name' var='invitedInstitutionName'/>
 <spring:message code='label.invited.institution.address' var='invitedInstitutionAddress'/>
@@ -23,7 +24,7 @@
 <spring:message code='label.contact.sos' var='contactSOS'/>
 <spring:message code='label.id.document.type' var='idDocumentType'/>
 <spring:message code='label.id.document.number' var='idDocumentNumber'/>
-
+<spring:message code='label.gender' var='gender'/>
 
 
 <c:if test="${! empty inviteBean}">
@@ -40,8 +41,23 @@
     <input type="hidden" class="form-control" id="invite" name="invite" required="required" value="${inviteBean.invite.externalId}"/>
 
     <div class="form-group">
-      <label for="name">${name}</label>
-      <input type="text" class="form-control" id="name" name="name" placeholder="${name}" required="required" value="${inviteBean.name}"/>
+      <label for="givenName">${givenName}</label>
+      <input type="text" class="form-control" id="givenName" name="givenName" placeholder="${givenName}" required="required" value="${inviteBean.givenName}"/>
+    </div>
+
+    <div class="form-group">
+      <label for="familyNames">${familyNames}</label>
+      <input type="text" class="form-control" id="familyNames" name="familyNames" placeholder="${familyNames}" required="required" value="${inviteBean.familyNames}"/>
+    </div>
+
+    <div class="form-group">
+      <label for="gender">${gender}</label>
+      <select id="gender" name="gender">
+        <option value="" label="--Please Select"/>
+        <c:forEach var="gender" items="${genderEnum}">
+          <option value="${gender}">${gender}</option>
+        </c:forEach>
+      </select>
     </div>
 
     <div class="form-group">

@@ -1,19 +1,34 @@
 package org.fenixedu.ext.users.domain;
 
+import java.util.Comparator;
+
+import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 public class Invite extends Invite_Base {
 
-    public Invite(User creator, String name, String email, String invitationInstitution, Interval period, String reason,
-            String idDocumentNumber, IDDocumentType idDocumentType, String invitedInstitutionAddress,
-            String invitedInstitutionName, String contact, String contactSOS) {
+    public final static Comparator<Invite> COMPARATOR_BY_CREATION_TIME = new Comparator<Invite>() {
+
+        @Override
+        public int compare(Invite arg0, Invite arg1) {
+
+            return arg1.getCreationTime().compareTo(arg0.getCreationTime());
+        }
+    };
+
+    public Invite(User creator, String givenName, String familyNames, Gender gender, String email, String invitationInstitution,
+            Interval period, String reason, String idDocumentNumber, IDDocumentType idDocumentType,
+            String invitedInstitutionAddress, String invitedInstitutionName, String contact, String contactSOS) {
 
         setCreator(creator);
         setBennu(Bennu.getInstance());
-        setName(name);
+        setGivenName(givenName);
+        setFamilyNames(familyNames);
+        setGender(gender);
         setEmail(email);
         setInvitationInstitution(invitationInstitution);
         setPeriod(period);
@@ -23,6 +38,7 @@ public class Invite extends Invite_Base {
         setContact(contact);
         setContactSOS(contactSOS);
         setState(InviteState.NOT_COMPLETED);
+        setCreationTime(DateTime.now());
     }
 
     public String getCreatorFullName() {

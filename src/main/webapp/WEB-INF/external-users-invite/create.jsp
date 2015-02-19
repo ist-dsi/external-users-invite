@@ -11,12 +11,14 @@ ${portal.toolkit()}
   </div>
 </c:if>
 
-<spring:message code='label.name' var='name'/>
+<spring:message code='label.given.name' var='givenName'/>
 <spring:message code='label.email' var='email'/>
 <spring:message code='label.invitation.institution' var='invitationInstitution'/>
 <spring:message code='label.date.start' var='startDate'/>
 <spring:message code='label.date.end' var='endDate'/>
 <spring:message code='label.reason' var='reason'/>
+<spring:message code='label.gender' var='gender'/>
+<spring:message code='label.family.names' var='familyNames'/>
 
 
 <c:if test="${! empty inviteBean}">
@@ -25,8 +27,13 @@ ${portal.toolkit()}
     <input type="hidden" class="form-control" id="creator" name="creator" value="${inviteBean.creator}"/>
 
     <div class="form-group">
-      <label for="name">${name}</label>
-      <input type="text" class="form-control" id="name" name="name" placeholder="${name}" required="required" value="${inviteBean.name}"/>
+      <label for="givenName">${givenName}</label>
+      <input type="text" class="form-control" id="givenName" name="givenName" placeholder="${givenName}" required="required" value="${inviteBean.givenName}"/>
+    </div>
+
+    <div class="form-group">
+      <label for="familyNames">${familyNames}</label>
+      <input type="text" class="form-control" id="familyNames" name="familyNames" placeholder="${familyNames}" required="required" value="${inviteBean.familyNames}"/>
     </div>
 
     <div class="form-group">

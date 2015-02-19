@@ -1,5 +1,6 @@
 package org.fenixedu.ext.users.ui.bean;
 
+import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.ext.users.domain.Invite;
@@ -13,7 +14,9 @@ import pt.ist.fenixframework.Atomic.TxMode;
 
 public class InviteBean {
 
-    private String name;
+    private String givenName;
+    private String familyNames;
+    private Gender gender;
     private String email;
     private String invitationInstitution;
     private String startDate;
@@ -28,12 +31,12 @@ public class InviteBean {
     private User creator;
     private Invite invite;
 
-    public String getName() {
-        return name;
+    public String getGivenName() {
+        return givenName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setGivenName(String givenName) {
+        this.givenName = givenName;
     }
 
     public String getEmail() {
@@ -162,12 +165,30 @@ public class InviteBean {
         this.invite = invite;
     }
 
+    public String getFamilyNames() {
+        return familyNames;
+    }
+
+    public void setFamilyNames(String familyNames) {
+        this.familyNames = familyNames;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
     public InviteBean() {
 
     }
 
     public InviteBean(Invite invite) {
-        this.name = invite.getName();
+        this.givenName = (invite.getGivenName());
+        this.familyNames = invite.getFamilyNames();
+        this.gender = invite.getGender();
         this.email = invite.getEmail();
         this.invitationInstitution = invite.getInvitationInstitution();
         this.reason = invite.getReason();
@@ -188,7 +209,9 @@ public class InviteBean {
     }
 
     public static class Builder {
-        private final String name;
+        private final String givenName;
+        private final String familyNames;
+        private final Gender gender;
         private final String email;
         private final String invitationInstitution;
         private final String startDate;
@@ -204,7 +227,9 @@ public class InviteBean {
 
         public Builder(InviteBean inviteBean) {
 
-            this.name = inviteBean.getName();
+            this.givenName = inviteBean.getGivenName();
+            this.familyNames = inviteBean.getFamilyNames();
+            this.gender = inviteBean.getGender();
             this.email = inviteBean.getEmail();
             this.invitationInstitution = inviteBean.getInvitationInstitution();
             this.startDate = inviteBean.getStartDate();
@@ -230,8 +255,8 @@ public class InviteBean {
 
             Interval period = new Interval(startDateDT, endDateDT);
 
-            return new Invite(creator, name, email, invitationInstitution, period, reason, idDocumentNumber, idDocumentType,
-                    invitedInstitutionName, invitedInstitutionAddress, contact, contactSOS);
+            return new Invite(creator, givenName, familyNames, gender, email, invitationInstitution, period, reason,
+                    idDocumentNumber, idDocumentType, invitedInstitutionName, invitedInstitutionAddress, contact, contactSOS);
         }
     }
 }

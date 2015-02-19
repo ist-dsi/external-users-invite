@@ -8,7 +8,9 @@ enum org.fenixedu.ext.users.domain.InviteState as InviteState;
 // class definition
 
 class Invite {
-    public String name;
+    public String givenName;
+    public String familyNames;
+    public Gender gender;
     public String email;
     public String invitationInstitution;
     public Interval period;
@@ -20,6 +22,8 @@ class Invite {
     public String contact;
     public String contactSOS;
     public InviteState state;
+    public DateTime creationTime;
+    //TODO: should have expiration date?
 }
 
 //access groups relationships definition

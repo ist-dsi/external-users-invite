@@ -3,10 +3,10 @@
 
 
 <div class="page-header">
-  <h1>Example page header </h1>
+  <h1>_Example page header </h1>
 </div>
 <div class="well">
-  <p>This is an ordinary paragraph that is long enough to wrap to multiple lines so that you can see how the line spacing looks. This is an ordinary paragraph that is long enough to wrap to multiple lines so that you can see how the line spacing looks.</p>
+  <p>___This is an ordinary paragraph that is long enough to wrap to multiple lines so that you can see how the line spacing looks. This is an ordinary paragraph that is long enough to wrap to multiple lines so that you can see how the line spacing looks.</p>
 </div>
 
 <c:if test="${! empty messages}">
@@ -17,11 +17,21 @@
   </div>
 </c:if>
 
-<h3>Contextual title</h3>
+<c:if test="${empty admin || action}">
+  <div class="alert alert-danger" role="alert">
+    <p>__MISSING ADMIN || ACTION MODEL ATTRIBUTE</p>
+  </div>
+</c:if>
+  <div class="alert alert-danger" role="alert">
+    <p>__IS ADMIN? ${admin}</p>
+    <p>__ACTION? ${action}</p>
+  </div>
+
+<h3>_Contextual title</h3>
 <p>
   <div class="row">
     <div class="col-sm-8">
-      <a href="${pageContext.request.contextPath}/external-users-invite/newInvite" type="button" class="btn btn-primary">Create</a>
+      <a href="${pageContext.request.contextPath}/external-users-invite/newInvite" type="button" class="btn btn-primary">_Create</a>
     </div>
   </div>
 </p>
@@ -42,24 +52,32 @@
     </colgroup>
     <thead>
       <tr>
-        <th>Creator</th>
-        <th>Invited</th>
-        <th>Period</th>
-        <th>State</th>
+        <th>_Creator</th>
+        <th>_Creation date</th>
+        <th>_Invited</th>
+        <th>_Period</th>
+        <th>_State</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       <c:forEach items="${invites}" var="invite">
         <tr>
-          <td>${invite.creatorFullName}</td>
-          <td>${invite.name} (${invite.email})</td>
+          <td>${invite.creator.profile.fullName}</td>
+          <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+          <td>${invite.givenName} (${invite.email})</td>
           <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
           <td>${invite.state}</td>
           <td>
             <div class="btn-group btn-group-xs">
-              <button type="button" class="btn btn-default details-button" data-creator="${invite.creatorFullName}" data-invitationinstitution="${invite.invitationInstitution}" data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reason}" data-name="${invite.name}"
-                data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}" data-contact="${invite.contact}" data-contactsos="${invite.contactSOS}" data-state="${invite.state}">Details</button>
+              <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
+                data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reason}"
+                data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
+                data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
+                data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
+                _Details
+              </button>
             </div>
           </td>
         </tr>
@@ -87,21 +105,28 @@
         </div>
 
         <div class="form-group">
-          <label class="col-sm-4 control-label"><b><spring:message code='label.goals'/></b></label>
+          <label class="col-sm-4 control-label"><b><spring:message code='label.creation.time'/></b></label>
+          <div class="col-sm-8">
+            <div class="information creationtime"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-4 control-label"><b><spring:message code='label.invitation.institution'/></b></label>
           <div class="col-sm-8">
             <div class="information invitationinstitution"></div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="col-sm-4 control-label"><b><spring:message code='label.goals'/></b></label>
+          <label class="col-sm-4 control-label"><b><spring:message code='label.date.start'/></b></label>
           <div class="col-sm-8">
             <div class="information start"></div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="col-sm-4 control-label"><b><spring:message code='label.goals'/></b></label>
+          <label class="col-sm-4 control-label"><b><spring:message code='label.date.end'/></b></label>
           <div class="col-sm-8">
             <div class="information end"></div>
           </div>
@@ -118,6 +143,20 @@
           <label class="col-sm-4 control-label"><b><spring:message code='label.name'/></b></label>
           <div class="col-sm-8">
             <div class="information name"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-4 control-label"><b><spring:message code='label.family.names'/></b></label>
+          <div class="col-sm-8">
+            <div class="information familynames"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-4 control-label"><b><spring:message code='label.gender'/></b></label>
+          <div class="col-sm-8">
+            <div class="information gender"></div>
           </div>
         </div>
 
@@ -177,9 +216,9 @@
           </div>
         </div>
 
-        <div class="col-sm-offset-4">
-          <button class="btn btn-success">Accept</button>
-          <button class="btn btn-danger">Reject</button>
+        <div id='action-buttons' class="col-sm-offset-4">
+          <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="" class="btn btn-success" id='accept-btn'>_Accept</a>
+          <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="" class="btn btn-danger" id='reject-btn'>_Reject</a>
         </div>
 
       </div>
@@ -197,9 +236,26 @@ $(function(){
   $(".details-button").on("click", function(evt){
     var e = $(evt.target);
 
-    ['creator','invitationinstitution','start','end','reason', 'state', 'name', 'email', 'iddocumenttype', 'iddocumentnumber', 'invitedinstitutionname', 'invitedinstitutionaddress', 'contact', 'contactsos'].map(function(x){
+    ['creator','creationtime', 'invitationinstitution','start','end','reason', 'state', 'name', 'familynames', 'gender', 'email', 'iddocumenttype', 'iddocumentnumber', 'invitedinstitutionname', 'invitedinstitutionaddress', 'contact', 'contactsos'].map(function(x){
       $("#modal ." + x).html(e.data(x));
     });
+
+    var oid = e.data('oid')
+
+    var acceptBtn = $('#accept-btn')
+    $(acceptBtn).attr('href', $(acceptBtn).data('base-url') + oid)
+    var rejectBtn = $('#reject-btn')
+    $(rejectBtn).attr('href', $(rejectBtn).data('base-url') + oid)
+
+    // var state = e.data('state')
+    // $(acceptBtn).css('visibility', 'hidden');
+    // $(rejectBtn).css('visibility', 'hidden');
+    // if(state == 'NOT_COMPLETED' || state == 'COMPLETED') {
+    //   $(rejectBtn).css("visibility", "visible");
+    // }
+    // if(state == 'COMPLETED') {
+    //   $(acceptBtn).css("visibility", "visible");
+    // }
 
     $('#modal').modal('show');
   });
