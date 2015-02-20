@@ -2,7 +2,6 @@ package org.fenixedu.ext.users.ui.controller;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.person.Gender;
@@ -25,8 +24,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequestMapping("/external-users-invite")
 @SpringApplication(group = "logged", path = "external-users-invite", title = "title.ExternalUsersInvite")
-@SpringFunctionality(app = ExternalUsersInviteController.class, title = "title.invites", accessGroup = "logged")
-public class ExternalUsersInviteController {
+@SpringFunctionality(app = InviteController.class, title = "title.invites", accessGroup = "logged")
+public class InviteController {
 
     @Autowired
     ExternalInviteService service;
@@ -36,15 +35,22 @@ public class ExternalUsersInviteController {
     @RequestMapping
     public String listInvites(Model model, RedirectAttributes redirectAttr) {
 
-        List<Invite> invites =
-                Bennu.getInstance().getInviteSet().stream()
-                        .filter(i -> i.getCreator() != null && i.getCreator().equals(Authenticate.getUser()))
-                        .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+        List<Invite> invites = service.getUserInvites();
+
+        List<Invite> completedInvites = service.filterCompletedInvites(invites);
+        List<Invite> notCompletedInvites = service.filterNotCompletedInvites(invites);
+        List<Invite> confirmedInvites = service.filterConfirmedInvites(invites);
+        List<Invite> rejectedInvites = service.filterRejectedInvites(invites);
+
+        model.addAttribute("emptyInvites", invites.isEmpty());
+        model.addAttribute("completedInvites", completedInvites);
+        model.addAttribute("notCompletedInvites", notCompletedInvites);
+        model.addAttribute("confirmedInvites", confirmedInvites);
+        model.addAttribute("rejectedInvites", rejectedInvites);
 
         model.addAllAttributes(redirectAttr.getFlashAttributes());
         model.addAttribute("action", "/external-users-invite");
         model.addAttribute("admin", false);
-        model.addAttribute("invites", invites);
 
         return "external-users-invite/list";
     }
@@ -52,8 +58,11 @@ public class ExternalUsersInviteController {
     @RequestMapping(value = "/newInvite", method = RequestMethod.GET)
     public String startInvite(Model model) {
 
-        InviteBean bean = new InviteBean();
-        model.addAttribute("inviteBean", bean);
+        //TODO: remove this little hack very soon
+        service.populateReasonsHACK();
+
+        model.addAttribute("reasons", Bennu.getInstance().getReasonSet());
+        model.addAttribute("inviteBean", new InviteBean());
 
         return "external-users-invite/create";
     }

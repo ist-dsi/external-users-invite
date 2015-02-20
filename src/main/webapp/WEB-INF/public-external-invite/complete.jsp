@@ -31,7 +31,7 @@
   <div class="well">
     <p><b><spring:message code='label.inviter'/>:</b> ${inviteBean.getCreatorFullName()}</p>
     <p><b><spring:message code='label.invitation.institution'/>:</b> ${inviteBean.invitationInstitution}</p>
-    <p><b><spring:message code='label.reason'/>:</b> ${inviteBean.reason}</p>
+    <p><b><spring:message code='label.reason'/>:</b> ${inviteBean.reasonName} - ${inviteBean.reasonDescription}</p>
     <p><b><spring:message code='label.date.start'/>:</b> ${inviteBean.getStartDateFormatted()}</p>
     <p><b><spring:message code='label.date.end'/>:</b> ${inviteBean.getEndDateFormatted()}</p>
   </div>
@@ -58,11 +58,6 @@
           <option value="${gender}">${gender}</option>
         </c:forEach>
       </select>
-    </div>
-
-    <div class="form-group">
-      <label for="email">${email}</label>
-      <input type="email" class="form-control" id="email" name="email" placeholder="${email}" required="required" value="${inviteBean.email}"/>
     </div>
 
     <div class="form-group">

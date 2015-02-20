@@ -17,6 +17,7 @@ ${portal.toolkit()}
 <spring:message code='label.date.start' var='startDate'/>
 <spring:message code='label.date.end' var='endDate'/>
 <spring:message code='label.reason' var='reason'/>
+<spring:message code='label.reason.other' var='otherReason'/>
 <spring:message code='label.gender' var='gender'/>
 <spring:message code='label.family.names' var='familyNames'/>
 
@@ -58,7 +59,18 @@ ${portal.toolkit()}
 
     <div class="form-group">
       <label for="reason">${reason}</label>
-      <input type="text" class="form-control" id="reason" name="reason" placeholder="${reason}" required="required" value="${inviteBean.reason}"/>
+      <select id="reason" name="reason">
+        <option value="" label="--Please Select"/>
+        <c:forEach var="reason" items="${reasons}">
+          <option value="${reason.externalId}">${reason.name} - ${reason.description}</option>
+        </c:forEach>
+      </select>
+
+    </div>
+
+    <div class="form-group">
+      <label for="otherReason">${otherReason}</label>
+      <input type="text" class="form-control" id="otherReason" name="otherReason" placeholder="${otherReason}" value="${inviteBean.otherReason}"/>
     </div>
 
     <button type="submit" class="btn btn-primary" id="submitButton">submitButton</button>

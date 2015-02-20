@@ -22,10 +22,6 @@
     <p>__MISSING ADMIN || ACTION MODEL ATTRIBUTE</p>
   </div>
 </c:if>
-  <div class="alert alert-danger" role="alert">
-    <p>__IS ADMIN? ${admin}</p>
-    <p>__ACTION? ${action}</p>
-  </div>
 
 <h3>_Contextual title</h3>
 <p>
@@ -36,54 +32,237 @@
   </div>
 </p>
 
-<c:if test="${empty invites}">
+<c:if test="${emptyInvites}">
   <div class="alert alert-warning">
     <p><spring:message code='label.invites.empty'/></p>
   </div>
 </c:if>
-<c:if test="${! empty invites}">
-  <table class="table">
-    <colgroup>
-      <col></col>
-      <col></col>
-      <col></col>
-      <col></col>
-      <col></col>
-    </colgroup>
-    <thead>
-      <tr>
-        <th>_Creator</th>
-        <th>_Creation date</th>
-        <th>_Invited</th>
-        <th>_Period</th>
-        <th>_State</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <c:forEach items="${invites}" var="invite">
-        <tr>
-          <td>${invite.creator.profile.fullName}</td>
-          <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
-          <td>${invite.givenName} (${invite.email})</td>
-          <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
-          <td>${invite.state}</td>
-          <td>
-            <div class="btn-group btn-group-xs">
-              <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
-                data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reason}"
-                data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
-                data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
-                data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
-                data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
-                _Details
-              </button>
-            </div>
-          </td>
-        </tr>
-      </c:forEach>
-    </tbody>
-  </table>
+
+<c:if test="${! emptyInvites}">
+
+  <c:if test="${empty completedInvites}">
+    <div class="alert alert-success">
+      <p>__You dont' have invites needing confirmation</p>
+    </div>
+  </c:if>
+  <c:if test="${! empty completedInvites}">
+    <div class="panel panel-warning">
+      <!-- Default panel contents -->
+      <div class="panel-heading">__Needing confirmation</div>
+      <div class="panel-body">
+        <p>__This invites require your confirmation</p>
+      </div>
+
+      <!-- Table -->
+      <table class="table">
+        <colgroup>
+          <col></col>
+          <col></col>
+          <col></col>
+          <col></col>
+          <col></col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>_Creator</th>
+            <th>_Creation date</th>
+            <th>_Invited</th>
+            <th>_Period</th>
+            <th>_State</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:forEach items="${completedInvites}" var="invite">
+            <tr>
+              <td>${invite.creator.profile.fullName}</td>
+              <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.givenName} (${invite.email})</td>
+              <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.state}</td>
+              <td>
+                <div class="btn-group btn-group-xs">
+                  <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="${pageContext.request.contextPath}${action}/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'>_Accept</a>
+                  <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="${pageContext.request.contextPath}${action}/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'>_Reject</a>
+                  <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
+                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reasonName} - ${invite.reasonDescription}"
+                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
+                    data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                    data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
+                    data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
+                    _Details
+                  </button>
+                  </div>
+              </td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </div>
+  </c:if>
+
+  <c:if test="${! empty notCompletedInvites}">
+    <div class="panel panel-default">
+      <!-- Default panel contents -->
+      <div class="panel-heading">__Incomplete</div>
+      <div class="panel-body">
+        <p>__This invites require invited-side completion</p>
+      </div>
+
+      <!-- Table -->
+      <table class="table">
+        <colgroup>
+          <col></col>
+          <col></col>
+          <col></col>
+          <col></col>
+          <col></col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>_Creator</th>
+            <th>_Creation date</th>
+            <th>_Invited</th>
+            <th>_Period</th>
+            <th>_State</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:forEach items="${notCompletedInvites}" var="invite">
+            <tr>
+              <td>${invite.creator.profile.fullName}</td>
+              <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.givenName} (${invite.email})</td>
+              <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.state}</td>
+              <td>
+                <div class="btn-group btn-group-xs">
+                  <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
+                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reasonName} - ${invite.reasonDescription}"
+                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
+                    data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                    data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
+                    data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
+                    _Details
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </div>
+  </c:if>
+
+  <c:if test="${! empty confirmedInvites}">
+    <div class="panel panel-default">
+      <!-- Default panel contents -->
+      <div class="panel-heading">__Confirmed</div>
+      <div class="panel-body">
+        <p>__This invites have been confirmed</p>
+      </div>
+
+      <!-- Table -->
+      <table class="table">
+        <colgroup>
+          <col></col>
+          <col></col>
+          <col></col>
+          <col></col>
+          <col></col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>_Creator</th>
+            <th>_Creation date</th>
+            <th>_Invited</th>
+            <th>_Period</th>
+            <th>_State</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:forEach items="${confirmedInvites}" var="invite">
+            <tr>
+              <td>${invite.creator.profile.fullName}</td>
+              <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.givenName} (${invite.email})</td>
+              <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.state}</td>
+              <td>
+                <div class="btn-group btn-group-xs">
+                  <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
+                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reasonName} - ${invite.reasonDescription}"
+                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
+                    data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                    data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
+                    data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
+                    _Details
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </div>
+  </c:if>
+
+  <c:if test="${! empty rejectedInvites}">
+    <div class="panel panel-default">
+      <!-- Default panel contents -->
+      <div class="panel-heading">__Rejected</div>
+      <div class="panel-body">
+        <p>__This invites have been rejected</p>
+      </div>
+
+      <!-- Table -->
+      <table class="table">
+        <colgroup>
+          <col></col>
+          <col></col>
+          <col></col>
+          <col></col>
+          <col></col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>_Creator</th>
+            <th>_Creation date</th>
+            <th>_Invited</th>
+            <th>_Period</th>
+            <th>_State</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:forEach items="${rejectedInvites}" var="invite">
+            <tr>
+              <td>${invite.creator.profile.fullName}</td>
+              <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.givenName} (${invite.email})</td>
+              <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.state}</td>
+              <td>
+                <div class="btn-group btn-group-xs">
+                  <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
+                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reasonName} - ${invite.reasonDescription}"
+                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
+                    data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                    data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
+                    data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
+                    _Details
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </div>
+  </c:if>
+
 </c:if>
 
 <!-- Modal -->
@@ -246,16 +425,6 @@ $(function(){
     $(acceptBtn).attr('href', $(acceptBtn).data('base-url') + oid)
     var rejectBtn = $('#reject-btn')
     $(rejectBtn).attr('href', $(rejectBtn).data('base-url') + oid)
-
-    // var state = e.data('state')
-    // $(acceptBtn).css('visibility', 'hidden');
-    // $(rejectBtn).css('visibility', 'hidden');
-    // if(state == 'NOT_COMPLETED' || state == 'COMPLETED') {
-    //   $(rejectBtn).css("visibility", "visible");
-    // }
-    // if(state == 'COMPLETED') {
-    //   $(acceptBtn).css("visibility", "visible");
-    // }
 
     $('#modal').modal('show');
   });

@@ -14,7 +14,6 @@ class Invite {
     public String email;
     public String invitationInstitution;
     public Interval period;
-    public String reason;
     public String idDocumentNumber;
     public IDDocumentType idDocumentType;
     public String invitedInstitutionName;
@@ -23,7 +22,14 @@ class Invite {
     public String contactSOS;
     public InviteState state;
     public DateTime creationTime;
+    public String otherReason;
+    public String hash;
     //TODO: should have expiration date?
+}
+
+class Reason {
+    String name;
+    String description;
 }
 
 //access groups relationships definition
@@ -34,6 +40,15 @@ relation BennuInvite {
         multiplicity 1..1;
     }
     public Invite playsRole invite {
+        multiplicity 0..*;
+    }
+}
+
+relation BennuReason {
+    public .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
+        multiplicity 1..1;
+    }
+    public Reason playsRole reason {
         multiplicity 0..*;
     }
 }
@@ -51,6 +66,15 @@ relation InvitedUserProfile {
 relation InviteCreator {
     public .org.fenixedu.bennu.core.domain.User playsRole creator {
         multiplicity 1..1;
+    }
+    public Invite playsRole invite  {
+        multiplicity 0..*;
+    }
+ }
+
+relation InviteReason {
+    protected Reason playsRole reason{
+        multiplicity 0..1;
     }
     public Invite playsRole invite  {
         multiplicity 0..*;

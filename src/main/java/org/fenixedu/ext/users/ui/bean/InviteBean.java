@@ -4,6 +4,7 @@ import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.ext.users.domain.Invite;
+import org.fenixedu.ext.users.domain.Reason;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormatter;
@@ -21,7 +22,6 @@ public class InviteBean {
     private String invitationInstitution;
     private String startDate;
     private String endDate;
-    private String reason;
     private String idDocumentNumber;
     private IDDocumentType idDocumentType;
     private String invitedInstitutionName;
@@ -30,6 +30,10 @@ public class InviteBean {
     private String contactSOS;
     private User creator;
     private Invite invite;
+    private Reason reason;
+    private String otherReason;
+    private String reasonName;
+    private String reasonDescription;
 
     public String getGivenName() {
         return givenName;
@@ -53,14 +57,6 @@ public class InviteBean {
 
     public void setInvitationInstitution(String invitationInstitution) {
         this.invitationInstitution = invitationInstitution;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
     }
 
     public String getIdDocumentNumber() {
@@ -181,6 +177,30 @@ public class InviteBean {
         this.gender = gender;
     }
 
+    public Reason getReason() {
+        return reason;
+    }
+
+    public void setReason(Reason reason) {
+        this.reason = reason;
+    }
+
+    public String getOtherReason() {
+        return otherReason;
+    }
+
+    public void setOtherReason(String otherReason) {
+        this.otherReason = otherReason;
+    }
+
+    public String getReasonName() {
+        return this.reasonName;
+    }
+
+    public String getReasonDescription() {
+        return this.reasonDescription;
+    }
+
     public InviteBean() {
 
     }
@@ -191,8 +211,10 @@ public class InviteBean {
         this.gender = invite.getGender();
         this.email = invite.getEmail();
         this.invitationInstitution = invite.getInvitationInstitution();
-        this.reason = invite.getReason();
         this.creator = invite.getCreator();
+        this.otherReason = invite.getOtherReason();
+        this.reasonName = invite.getReasonName();
+        this.reasonDescription = invite.getReasonDescription();
         this.setInvite(invite);
 
         Interval period = invite.getPeriod();
@@ -216,7 +238,6 @@ public class InviteBean {
         private final String invitationInstitution;
         private final String startDate;
         private final String endDate;
-        private final String reason;
         private final String idDocumentNumber;
         private final IDDocumentType idDocumentType;
         private final String invitedInstitutionName;
@@ -224,6 +245,8 @@ public class InviteBean {
         private final String contact;
         private final String contactSOS;
         private final User creator;
+        private final Reason reason;
+        private final String otherReason;
 
         public Builder(InviteBean inviteBean) {
 
@@ -235,6 +258,7 @@ public class InviteBean {
             this.startDate = inviteBean.getStartDate();
             this.endDate = inviteBean.getEndDate();
             this.reason = inviteBean.getReason();
+            this.otherReason = inviteBean.getOtherReason();
             this.creator = inviteBean.getCreator();
 
             this.idDocumentType = inviteBean.getIdDocumentType();
@@ -255,7 +279,7 @@ public class InviteBean {
 
             Interval period = new Interval(startDateDT, endDateDT);
 
-            return new Invite(creator, givenName, familyNames, gender, email, invitationInstitution, period, reason,
+            return new Invite(creator, givenName, familyNames, gender, email, invitationInstitution, period, reason, otherReason,
                     idDocumentNumber, idDocumentType, invitedInstitutionName, invitedInstitutionAddress, contact, contactSOS);
         }
     }

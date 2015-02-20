@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@SpringFunctionality(app = ExternalUsersInviteController.class, title = "title.invites.admin", accessGroup = "logged")
+@SpringFunctionality(app = InviteController.class, title = "title.invites.admin", accessGroup = "logged")
 @RequestMapping("/admin-external-invite")
 public class AdminController {
 
