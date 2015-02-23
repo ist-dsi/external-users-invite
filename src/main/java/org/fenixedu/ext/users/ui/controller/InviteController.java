@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.person.Gender;
-import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -13,6 +11,7 @@ import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
+import org.fenixedu.ext.users.ui.exception.UnauthorisedUserException;
 import org.fenixedu.ext.users.ui.service.ExternalInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -62,6 +61,7 @@ public class InviteController {
         service.populateReasonsHACK();
 
         model.addAttribute("reasons", Bennu.getInstance().getReasonSet());
+        model.addAttribute("units", service.getUnits());
         model.addAttribute("inviteBean", new InviteBean());
 
         return "external-users-invite/create";
@@ -89,7 +89,10 @@ public class InviteController {
     @RequestMapping(value = "/confirmInvite/{oid}", method = RequestMethod.GET)
     public String confirmInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
-        //TODO: check creator = auth.getUser
+        if (!Authenticate.getUser().equals(invite.getCreator())) {
+            throw new UnauthorisedUserException();
+        }
+
         //TODO: check state
 
         Person person = service.confirmInvite(invite, false);
@@ -105,7 +108,10 @@ public class InviteController {
     @RequestMapping(value = "/rejectInvite/{oid}", method = RequestMethod.GET)
     public String rejectInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
-        //TODO: check creator = auth.getUser
+        if (!Authenticate.getUser().equals(invite.getCreator())) {
+            throw new UnauthorisedUserException();
+        }
+
         //TODO: check state
 
         service.rejectInvite(invite, false);
@@ -116,43 +122,5 @@ public class InviteController {
                         invite.getEmail() })));
 
         return "redirect:/external-users-invite";
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //                              TODO: remove from here                               //
-    //                                  invited API                                      //
-    //                                      hash                                         //
-    ///////////////////////////////////////////////////////////////////////////////////////
-
-    @RequestMapping(value = "/completeInvite/{oid}", method = RequestMethod.GET)
-    public String completeInvite(@PathVariable("oid") Invite invite, Model model) {
-
-        if (invite != null) {
-            InviteBean inviteBean = new InviteBean(invite);
-            model.addAttribute("inviteBean", inviteBean);
-            model.addAttribute("genderEnum", Gender.values());
-            model.addAttribute("IDDocumentTypes", IDDocumentType.values());
-        } else {
-            model.addAttribute("error", BundleUtil.getString(BUNDLE, "error.complete.invite.not.found"));
-        }
-
-        return "external-users-invite/complete";
-    }
-
-    @RequestMapping(value = "/submitCompletion", method = RequestMethod.POST)
-    public String submitCompletion(InviteBean inviteBean, Model model) {
-
-        //TODO: validate fields
-        Invite invite = service.updateCompletedInvite(inviteBean);
-
-        model.addAttribute(
-                "messages",
-                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.completion.successfully", new String[] { invite
-                        .getCreator().getProfile().getFullName() })));
-
-        inviteBean = new InviteBean(invite);
-        model.addAttribute("inviteBean", inviteBean);
-
-        return "external-users-invite/complete";
     }
 }

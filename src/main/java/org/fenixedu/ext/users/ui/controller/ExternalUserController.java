@@ -8,6 +8,7 @@ import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
+import org.fenixedu.ext.users.ui.exception.ExternalInviteException;
 import org.fenixedu.ext.users.ui.service.ExternalInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -27,17 +28,14 @@ public class ExternalUserController {
     @RequestMapping(value = "/completeInvite/{hash}", method = RequestMethod.GET)
     public String completeInvite(@PathVariable("hash") String hash, Model model) {
 
-        System.out.println("public !");
-
-        Invite invite = service.getInviteFromHash(hash);
-
-        if (invite != null) {
+        try {
+            Invite invite = service.getInviteFromHash(hash);
             InviteBean inviteBean = new InviteBean(invite);
             model.addAttribute("inviteBean", inviteBean);
             model.addAttribute("genderEnum", Gender.values());
             model.addAttribute("IDDocumentTypes", IDDocumentType.values());
-        } else {
-            model.addAttribute("error", BundleUtil.getString(BUNDLE, "error.complete.invite.not.found"));
+        } catch (ExternalInviteException e) {
+            model.addAttribute("error", e.getClass().getSimpleName());
         }
 
         return "public-external-invite/complete";
@@ -45,8 +43,6 @@ public class ExternalUserController {
 
     @RequestMapping(value = "/submitCompletion", method = RequestMethod.POST)
     public String submitCompletion(InviteBean inviteBean, Model model) {
-
-        System.out.println("public !");
 
         //TODO: validate fields
         Invite invite = service.updateCompletedInvite(inviteBean);

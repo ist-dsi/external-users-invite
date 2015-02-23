@@ -3,10 +3,10 @@
 
 
 <div class="page-header">
-  <h1>_Example page header </h1>
+  <h1><spring:message code='title.invites'/></h1>
 </div>
 <div class="well">
-  <p>___This is an ordinary paragraph that is long enough to wrap to multiple lines so that you can see how the line spacing looks. This is an ordinary paragraph that is long enough to wrap to multiple lines so that you can see how the line spacing looks.</p>
+  <p><spring:message code='external.invites.list.well'/></p>
 </div>
 
 <c:if test="${! empty messages}">
@@ -17,17 +17,10 @@
   </div>
 </c:if>
 
-<c:if test="${empty admin || action}">
-  <div class="alert alert-danger" role="alert">
-    <p>__MISSING ADMIN || ACTION MODEL ATTRIBUTE</p>
-  </div>
-</c:if>
-
-<h3>_Contextual title</h3>
 <p>
   <div class="row">
     <div class="col-sm-8">
-      <a href="${pageContext.request.contextPath}/external-users-invite/newInvite" type="button" class="btn btn-primary">_Create</a>
+      <a href="${pageContext.request.contextPath}/external-users-invite/newInvite" type="button" class="btn btn-primary"><spring:message code='button.create'/></a>
     </div>
   </div>
 </p>
@@ -42,15 +35,15 @@
 
   <c:if test="${empty completedInvites}">
     <div class="alert alert-success">
-      <p>__You dont' have invites needing confirmation</p>
+      <p><spring:message code='label.completed.invites.empty'/></p>
     </div>
   </c:if>
   <c:if test="${! empty completedInvites}">
     <div class="panel panel-warning">
       <!-- Default panel contents -->
-      <div class="panel-heading">__Needing confirmation</div>
+      <div class="panel-heading"><spring:message code='title.unconfirmed.invites'/></div>
       <div class="panel-body">
-        <p>__This invites require your confirmation</p>
+        <p><spring:message code='label.unconfirmed.invites'/></p>
       </div>
 
       <!-- Table -->
@@ -64,11 +57,11 @@
         </colgroup>
         <thead>
           <tr>
-            <th>_Creator</th>
-            <th>_Creation date</th>
-            <th>_Invited</th>
-            <th>_Period</th>
-            <th>_State</th>
+            <th><spring:message code='label.inviter'/></th>
+            <th><spring:message code='label.creation.time'/></th>
+            <th><spring:message code='label.invited'/></th>
+            <th><spring:message code='label.period'/></th>
+            <th><spring:message code='label.state'/></th>
             <th></th>
           </tr>
         </thead>
@@ -79,18 +72,24 @@
               <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
               <td>${invite.givenName} (${invite.email})</td>
               <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
-              <td>${invite.state}</td>
+              <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
-                  <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="${pageContext.request.contextPath}${action}/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'>_Accept</a>
-                  <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="${pageContext.request.contextPath}${action}/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'>_Reject</a>
-                  <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
-                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reasonName} - ${invite.reasonDescription}"
-                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
-                    data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                  <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="${pageContext.request.contextPath}${action}/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'><spring:message code='button.accept'/></a>
+                  <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="${pageContext.request.contextPath}${action}/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'><spring:message code='button.reject'/></a>
+                  <button type="button" class="btn btn-default details-button"
+                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}"
+                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}"
+                    data-reason="${invite.reasonName} - ${invite.reasonDescription}"
+                    data-invitationinstitution="${invite.invitationInstitution}" data-unit="${invite.unit.name} (${invite.unit.acronym})"
+                    data-state="${invite.state.localizedName}"
+                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}"
+                    data-email="${invite.email}" data-contact="${invite.contact}"   data-contactsos="${invite.contactSOS}"
+                    data-gender="${invite.gender}"
+                    data-iddocumenttype="${invite.idDocumentType}" data-iddocumentnumber="${invite.idDocumentNumber}"
                     data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
-                    data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
-                    _Details
+                    data-oid="${invite.externalId}">
+                    <spring:message code='button.details'/>
                   </button>
                   </div>
               </td>
@@ -104,9 +103,9 @@
   <c:if test="${! empty notCompletedInvites}">
     <div class="panel panel-default">
       <!-- Default panel contents -->
-      <div class="panel-heading">__Incomplete</div>
+      <div class="panel-heading"><spring:message code='title.incomplete.invites'/></div>
       <div class="panel-body">
-        <p>__This invites require invited-side completion</p>
+        <p><spring:message code='label.incomplete.invites'/></p>
       </div>
 
       <!-- Table -->
@@ -120,11 +119,11 @@
         </colgroup>
         <thead>
           <tr>
-            <th>_Creator</th>
-            <th>_Creation date</th>
-            <th>_Invited</th>
-            <th>_Period</th>
-            <th>_State</th>
+            <th><spring:message code='label.inviter'/></th>
+            <th><spring:message code='label.creation.time'/></th>
+            <th><spring:message code='label.invited'/></th>
+            <th><spring:message code='label.period'/></th>
+            <th><spring:message code='label.state'/></th>
             <th></th>
           </tr>
         </thead>
@@ -135,16 +134,22 @@
               <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
               <td>${invite.givenName} (${invite.email})</td>
               <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
-              <td>${invite.state}</td>
+              <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
-                  <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
-                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reasonName} - ${invite.reasonDescription}"
-                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
-                    data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                  <button type="button" class="btn btn-default details-button"
+                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}"
+                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}"
+                    data-reason="${invite.reasonName} - ${invite.reasonDescription}"
+                    data-invitationinstitution="${invite.invitationInstitution}" data-unit="${invite.unit.name} (${invite.unit.acronym})"
+                    data-state="${invite.state.localizedName}"
+                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}"
+                    data-email="${invite.email}" data-contact="${invite.contact}"   data-contactsos="${invite.contactSOS}"
+                    data-gender="${invite.gender}"
+                    data-iddocumenttype="${invite.idDocumentType}" data-iddocumentnumber="${invite.idDocumentNumber}"
                     data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
-                    data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
-                    _Details
+                    data-oid="${invite.externalId}">
+                    <spring:message code='button.details'/>
                   </button>
                 </div>
               </td>
@@ -158,9 +163,9 @@
   <c:if test="${! empty confirmedInvites}">
     <div class="panel panel-default">
       <!-- Default panel contents -->
-      <div class="panel-heading">__Confirmed</div>
+      <div class="panel-heading"><spring:message code='title.confirmed.invites'/></div>
       <div class="panel-body">
-        <p>__This invites have been confirmed</p>
+        <p><spring:message code='label.confirmed.invites'/></p>
       </div>
 
       <!-- Table -->
@@ -174,11 +179,11 @@
         </colgroup>
         <thead>
           <tr>
-            <th>_Creator</th>
-            <th>_Creation date</th>
-            <th>_Invited</th>
-            <th>_Period</th>
-            <th>_State</th>
+            <th><spring:message code='label.inviter'/></th>
+            <th><spring:message code='label.creation.time'/></th>
+            <th><spring:message code='label.invited'/></th>
+            <th><spring:message code='label.period'/></th>
+            <th><spring:message code='label.state'/></th>
             <th></th>
           </tr>
         </thead>
@@ -189,16 +194,22 @@
               <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
               <td>${invite.givenName} (${invite.email})</td>
               <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
-              <td>${invite.state}</td>
+              <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
-                  <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
-                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reasonName} - ${invite.reasonDescription}"
-                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
-                    data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                  <button type="button" class="btn btn-default details-button"
+                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}"
+                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}"
+                    data-reason="${invite.reasonName} - ${invite.reasonDescription}"
+                    data-invitationinstitution="${invite.invitationInstitution}" data-unit="${invite.unit.name} (${invite.unit.acronym})"
+                    data-state="${invite.state.localizedName}"
+                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}"
+                    data-email="${invite.email}" data-contact="${invite.contact}"   data-contactsos="${invite.contactSOS}"
+                    data-gender="${invite.gender}"
+                    data-iddocumenttype="${invite.idDocumentType}" data-iddocumentnumber="${invite.idDocumentNumber}"
                     data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
-                    data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
-                    _Details
+                    data-oid="${invite.externalId}">
+                    <spring:message code='button.details'/>
                   </button>
                 </div>
               </td>
@@ -212,9 +223,9 @@
   <c:if test="${! empty rejectedInvites}">
     <div class="panel panel-default">
       <!-- Default panel contents -->
-      <div class="panel-heading">__Rejected</div>
+      <div class="panel-heading"><spring:message code='title.rejected.invites'/></div>
       <div class="panel-body">
-        <p>__This invites have been rejected</p>
+        <p><spring:message code='label.rejected.invites'/></p>
       </div>
 
       <!-- Table -->
@@ -228,11 +239,11 @@
         </colgroup>
         <thead>
           <tr>
-            <th>_Creator</th>
-            <th>_Creation date</th>
-            <th>_Invited</th>
-            <th>_Period</th>
-            <th>_State</th>
+            <th><spring:message code='label.inviter'/></th>
+            <th><spring:message code='label.creation.time'/></th>
+            <th><spring:message code='label.invited'/></th>
+            <th><spring:message code='label.period'/></th>
+            <th><spring:message code='label.state'/></th>
             <th></th>
           </tr>
         </thead>
@@ -243,16 +254,22 @@
               <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
               <td>${invite.givenName} (${invite.email})</td>
               <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
-              <td>${invite.state}</td>
+              <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
-                  <button type="button" class="btn btn-default details-button" data-creator="${invite.creator.profile.fullName}" data-contact="${invite.contact}" data-gender="${invite.gender}"
-                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}" data-reason="${invite.reasonName} - ${invite.reasonDescription}"
-                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}" data-email="${invite.email}" data-iddocumenttype="${invite.idDocumentType}"  data-state="${invite.state}"
-                    data-contactsos="${invite.contactSOS}" data-iddocumentnumber="${invite.idDocumentNumber}" data-invitationinstitution="${invite.invitationInstitution}"
+                  <button type="button" class="btn btn-default details-button"
+                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}"
+                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}"
+                    data-reason="${invite.reasonName} - ${invite.reasonDescription}"
+                    data-invitationinstitution="${invite.invitationInstitution}" data-unit="${invite.unit.name} (${invite.unit.acronym})"
+                    data-state="${invite.state.localizedName}"
+                    data-name="${invite.givenName}" data-familynames="${invite.familyNames}"
+                    data-email="${invite.email}" data-contact="${invite.contact}"   data-contactsos="${invite.contactSOS}"
+                    data-gender="${invite.gender}"
+                    data-iddocumenttype="${invite.idDocumentType}" data-iddocumentnumber="${invite.idDocumentNumber}"
                     data-invitedinstitutionname="${invite.invitedInstitutionName}" data-invitedinstitutionaddress="${invite.invitedInstitutionAddress}"
-                    data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}" data-oid="${invite.externalId}" data-state="${invite.state}">
-                    _Details
+                    data-oid="${invite.externalId}">
+                    <spring:message code='button.details'/>
                   </button>
                 </div>
               </td>
@@ -294,6 +311,13 @@
           <label class="col-sm-4 control-label"><b><spring:message code='label.invitation.institution'/></b></label>
           <div class="col-sm-8">
             <div class="information invitationinstitution"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-4 control-label"><b><spring:message code='label.unit'/></b></label>
+          <div class="col-sm-8">
+            <div class="information unit"></div>
           </div>
         </div>
 
@@ -396,8 +420,8 @@
         </div>
 
         <div id='action-buttons' class="col-sm-offset-4">
-          <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="" class="btn btn-success" id='accept-btn'>_Accept</a>
-          <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="" class="btn btn-danger" id='reject-btn'>_Reject</a>
+          <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="" class="btn btn-success" id='accept-btn'><spring:message code='button.accept'/></a>
+          <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="" class="btn btn-danger" id='reject-btn'><spring:message code='button.reject'/></a>
         </div>
 
       </div>
@@ -415,7 +439,7 @@ $(function(){
   $(".details-button").on("click", function(evt){
     var e = $(evt.target);
 
-    ['creator','creationtime', 'invitationinstitution','start','end','reason', 'state', 'name', 'familynames', 'gender', 'email', 'iddocumenttype', 'iddocumentnumber', 'invitedinstitutionname', 'invitedinstitutionaddress', 'contact', 'contactsos'].map(function(x){
+    ['creator','creationtime','invitationinstitution','unit','start','end','reason','state','name','familynames','gender','email','iddocumenttype','iddocumentnumber','invitedinstitutionname','invitedinstitutionaddress','contact','contactsos'].map(function(x){
       $("#modal ." + x).html(e.data(x));
     });
 

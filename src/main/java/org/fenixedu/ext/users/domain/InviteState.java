@@ -1,7 +1,10 @@
 package org.fenixedu.ext.users.domain;
 
-//TODO: comparator
-//TODO: toString
+import java.util.Locale;
+
+import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.I18N;
 
 public enum InviteState {
 
@@ -15,5 +18,17 @@ public enum InviteState {
 
     CONFIRMED_BY_MANAGER, //system manager accepts invite
 
-    REJECTED_BY_MANAGER //system manager rejects invite
+    REJECTED_BY_MANAGER; //system manager rejects invite
+
+    public String getQualifiedName() {
+        return InviteState.class.getSimpleName() + "." + name();
+    }
+
+    public String getLocalizedName() {
+        return getLocalizedName(I18N.getLocale());
+    }
+
+    public String getLocalizedName(Locale locale) {
+        return BundleUtil.getString(Bundle.ENUMERATION, locale, getQualifiedName());
+    }
 }

@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.UUID;
 
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -25,8 +26,9 @@ public class Invite extends Invite_Base {
     };
 
     public Invite(User creator, String givenName, String familyNames, Gender gender, String email, String invitationInstitution,
-            Interval period, Reason reason, String otherReason, String idDocumentNumber, IDDocumentType idDocumentType,
-            String invitedInstitutionAddress, String invitedInstitutionName, String contact, String contactSOS) {
+            Interval period, Reason reason, String otherReason, Unit unit, String idDocumentNumber,
+            IDDocumentType idDocumentType, String invitedInstitutionAddress, String invitedInstitutionName, String contact,
+            String contactSOS) {
 
         setCreator(creator);
         setBennu(Bennu.getInstance());
@@ -38,6 +40,7 @@ public class Invite extends Invite_Base {
         setPeriod(period);
         setReason(reason);
         setOtherReason(otherReason);
+        setUnit(unit);
         setInvitedInstitutionAddress(invitedInstitutionAddress);
         setInvitedInstitutionName(invitedInstitutionName);
         setContact(contact);

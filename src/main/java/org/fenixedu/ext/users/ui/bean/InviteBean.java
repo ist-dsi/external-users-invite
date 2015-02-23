@@ -1,5 +1,6 @@
 package org.fenixedu.ext.users.ui.bean;
 
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.bennu.core.domain.User;
@@ -34,6 +35,7 @@ public class InviteBean {
     private String otherReason;
     private String reasonName;
     private String reasonDescription;
+    private Unit unit;
 
     public String getGivenName() {
         return givenName;
@@ -201,6 +203,14 @@ public class InviteBean {
         return this.reasonDescription;
     }
 
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
+
     public InviteBean() {
 
     }
@@ -215,6 +225,7 @@ public class InviteBean {
         this.otherReason = invite.getOtherReason();
         this.reasonName = invite.getReasonName();
         this.reasonDescription = invite.getReasonDescription();
+        this.unit = invite.getUnit();
         this.setInvite(invite);
 
         Interval period = invite.getPeriod();
@@ -247,6 +258,7 @@ public class InviteBean {
         private final User creator;
         private final Reason reason;
         private final String otherReason;
+        private final Unit unit;
 
         public Builder(InviteBean inviteBean) {
 
@@ -260,6 +272,7 @@ public class InviteBean {
             this.reason = inviteBean.getReason();
             this.otherReason = inviteBean.getOtherReason();
             this.creator = inviteBean.getCreator();
+            this.unit = inviteBean.getUnit();
 
             this.idDocumentType = inviteBean.getIdDocumentType();
             this.idDocumentNumber = inviteBean.getIdDocumentNumber();
@@ -280,7 +293,8 @@ public class InviteBean {
             Interval period = new Interval(startDateDT, endDateDT);
 
             return new Invite(creator, givenName, familyNames, gender, email, invitationInstitution, period, reason, otherReason,
-                    idDocumentNumber, idDocumentType, invitedInstitutionName, invitedInstitutionAddress, contact, contactSOS);
+                    unit, idDocumentNumber, idDocumentType, invitedInstitutionName, invitedInstitutionAddress, contact,
+                    contactSOS);
         }
     }
 }

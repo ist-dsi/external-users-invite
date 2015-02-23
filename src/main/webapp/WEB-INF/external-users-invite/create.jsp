@@ -3,6 +3,13 @@
 
 ${portal.toolkit()}
 
+<div class="page-header">
+  <h1><spring:message code='title.invites.new'/></h1>
+</div>
+<div class="well">
+  <p><spring:message code='external.invites.new.well'/></p>
+</div>
+
 <c:if test="${! empty messages}">
   <div class="alert alert-success" role="alert">
     <c:forEach var="message" items="${messages}">
@@ -20,7 +27,7 @@ ${portal.toolkit()}
 <spring:message code='label.reason.other' var='otherReason'/>
 <spring:message code='label.gender' var='gender'/>
 <spring:message code='label.family.names' var='familyNames'/>
-
+<spring:message code='label.unit' var='unit'/>
 
 <c:if test="${! empty inviteBean}">
   <form method="POST" action="${pageContext.request.contextPath}/external-users-invite/sendInvite">
@@ -60,17 +67,26 @@ ${portal.toolkit()}
     <div class="form-group">
       <label for="reason">${reason}</label>
       <select id="reason" name="reason">
-        <option value="" label="--Please Select"/>
+        <option value="" label="__--Please Select"/>
         <c:forEach var="reason" items="${reasons}">
           <option value="${reason.externalId}">${reason.name} - ${reason.description}</option>
         </c:forEach>
       </select>
-
     </div>
 
     <div class="form-group">
       <label for="otherReason">${otherReason}</label>
       <input type="text" class="form-control" id="otherReason" name="otherReason" placeholder="${otherReason}" value="${inviteBean.otherReason}"/>
+    </div>
+
+    <div class="form-group">
+      <label for="unit">${unit}</label>
+      <select id="unit" name="unit">
+        <option value="" label="__--Please Select"/>
+        <c:forEach var="unit" items="${units}">
+          <option value="${unit.externalId}">${unit.name} <c:if test="${! empty unit.acronym}">(${unit.acronym})</c:if></option>
+        </c:forEach>
+      </select>
     </div>
 
     <button type="submit" class="btn btn-primary" id="submitButton">submitButton</button>

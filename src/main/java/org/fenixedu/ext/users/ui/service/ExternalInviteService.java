@@ -1,22 +1,27 @@
 package org.fenixedu.ext.users.ui.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserLoginPeriod;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.domain.InviteState;
 import org.fenixedu.ext.users.domain.Reason;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
+import org.fenixedu.ext.users.ui.exception.NonUniqueInviteHashException;
+import org.fenixedu.ext.users.ui.exception.UnexistentInviteHashException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -35,6 +40,34 @@ public class ExternalInviteService {
                 .collect(Collectors.toList());
     }
 
+    public List<Invite> getUserInvites() {
+        return Bennu.getInstance().getInviteSet().stream()
+                .filter(i -> i.getCreator() != null && i.getCreator().equals(Authenticate.getUser()))
+                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+    }
+
+    public List<Invite> filterConfirmedInvites(List<Invite> invites) {
+        return Stream
+                .concat(filterInvitesByState(invites, InviteState.CONFIRMED_BY_CREATOR).stream(),
+                        filterInvitesByState(invites, InviteState.CONFIRMED_BY_MANAGER).stream()).distinct()
+                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+    }
+
+    public List<Invite> filterRejectedInvites(List<Invite> invites) {
+        return Stream
+                .concat(filterInvitesByState(invites, InviteState.REJECTED_BY_CREATOR).stream(),
+                        filterInvitesByState(invites, InviteState.REJECTED_BY_MANAGER).stream()).distinct()
+                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+    }
+
+    public List<Invite> filterCompletedInvites(List<Invite> invites) {
+        return filterInvitesByState(invites, InviteState.COMPLETED);
+    }
+
+    public List<Invite> filterNotCompletedInvites(List<Invite> invites) {
+        return filterInvitesByState(invites, InviteState.NOT_COMPLETED);
+    }
+
     @Atomic(mode = TxMode.WRITE)
     public void sendInvite(Invite invite) {
 
@@ -44,8 +77,9 @@ public class ExternalInviteService {
                 messageSource.getMessage("external.user.invite.message.subject", new Object[] {
                         invite.getInvitationInstitution(), Authenticate.getUser().getProfile().getFullName() }, I18N.getLocale());
 
-        //TODO: fix link
-        String link = "http://localhost:8080/fenix/public-external-invite/completeInvite/" + invite.getHash();
+        String link =
+                CoreConfiguration.getConfiguration().applicationUrl() + "/public-external-invite/completeInvite/"
+                        + invite.getHash();
 
         String body =
                 messageSource.getMessage("external.user.invite.message.body", new Object[] {
@@ -80,7 +114,7 @@ public class ExternalInviteService {
     @Atomic(mode = TxMode.WRITE)
     public Person confirmInvite(Invite invite, boolean admin) {
 
-        invite.setState(admin ? InviteState.CONFIRMED_BY_CREATOR : InviteState.CONFIRMED_BY_MANAGER);
+        invite.setState(admin ? InviteState.CONFIRMED_BY_MANAGER : InviteState.CONFIRMED_BY_CREATOR);
 
         UserProfile userProfile = new UserProfile(invite.getGivenName(), invite.getFamilyNames(), null, invite.getEmail(), null);
         User user = new User(userProfile);
@@ -140,6 +174,21 @@ public class ExternalInviteService {
         new Message(Bennu.getInstance().getSystemSender(), null, null, subject, body, bcc);
     }
 
+    public Invite getInviteFromHash(String hash) throws NonUniqueInviteHashException, UnexistentInviteHashException {
+        Set<Invite> matchingInvites =
+                Bennu.getInstance().getInviteSet().stream().filter(i -> i.getHash().equals(hash)).collect(Collectors.toSet());
+
+        if (matchingInvites.size() > 1) {
+            throw new NonUniqueInviteHashException();
+        }
+
+        if (matchingInvites.size() == 0) {
+            throw new UnexistentInviteHashException();
+        }
+
+        return matchingInvites.iterator().next();
+    }
+
     //TODO: remove this little hack very soon
     @Atomic(mode = TxMode.WRITE)
     public void populateReasonsHACK() {
@@ -153,47 +202,32 @@ public class ExternalInviteService {
         }
     }
 
-    public List<Invite> getUserInvites() {
-        return Bennu.getInstance().getInviteSet().stream()
-                .filter(i -> i.getCreator() != null && i.getCreator().equals(Authenticate.getUser()))
-                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+    public List<Unit> getUnits() {
+        List<Unit> units = getDepartmentUnits();
+        List<Unit> researchUnits = getResearchUnits();
+
+        units.addAll(researchUnits);
+
+        return units;
     }
 
-    public List<Invite> filterConfirmedInvites(List<Invite> invites) {
-        return Stream
-                .concat(filterInvitesByState(invites, InviteState.CONFIRMED_BY_CREATOR).stream(),
-                        filterInvitesByState(invites, InviteState.CONFIRMED_BY_MANAGER).stream()).distinct()
-                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
-    }
+    private List<Unit> getResearchUnits() {
 
-    public List<Invite> filterRejectedInvites(List<Invite> invites) {
-        return Stream
-                .concat(filterInvitesByState(invites, InviteState.REJECTED_BY_CREATOR).stream(),
-                        filterInvitesByState(invites, InviteState.REJECTED_BY_MANAGER).stream()).distinct()
-                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
-    }
+        Set<Unit> researchUnitsRoot =
+                Bennu.getInstance().getInstitutionUnit().getSubUnits().stream()
+                        .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
 
-    public List<Invite> filterCompletedInvites(List<Invite> invites) {
-        return filterInvitesByState(invites, InviteState.COMPLETED);
-    }
-
-    public List<Invite> filterNotCompletedInvites(List<Invite> invites) {
-        return filterInvitesByState(invites, InviteState.NOT_COMPLETED);
-    }
-
-    public Invite getInviteFromHash(String hash) {
-        Set<Invite> matchingInvites =
-                Bennu.getInstance().getInviteSet().stream().filter(i -> i.getHash().equals(hash)).collect(Collectors.toSet());
-
-        if (matchingInvites.size() > 1) {
-            //TODO: throw exception?
-            System.out.println("more than one");
+        if (researchUnitsRoot.size() == 1) {
+            return researchUnitsRoot.iterator().next().getAllSubUnits().stream()
+                    .filter(u -> u.getSubUnits().isEmpty() && !u.getChildParties(Person.class).isEmpty()).distinct()
+                    .sorted(Unit.COMPARATOR_BY_NAME).collect(Collectors.toList());
+        } else {
+            return new ArrayList<Unit>();
         }
+    }
 
-        if (matchingInvites.size() == 1) {
-            return matchingInvites.iterator().next();
-        }
-
-        return null;
+    private List<Unit> getDepartmentUnits() {
+        return Bennu.getInstance().getDepartmentsSet().stream().map(d -> d.getDepartmentUnit()).distinct()
+                .collect(Collectors.toList());
     }
 }
