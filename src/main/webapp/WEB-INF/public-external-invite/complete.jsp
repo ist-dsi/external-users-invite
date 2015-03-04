@@ -19,7 +19,6 @@
 </c:if>
 
 <spring:message code='label.inviter' var='inviter'/>
-<spring:message code='label.invitation.institution' var='invitationInstitution'/>
 <spring:message code='label.unit' var='unit'/>
 <spring:message code='label.reason' var='reason'/>
 <spring:message code='label.date.start' var='startDate'/>
@@ -46,7 +45,6 @@
     <c:if test="${! empty inviteBean}">
       <div class="well">
         <p><b>${inviter}:</b> ${inviteBean.getCreatorFullName()}</p>
-        <p><b>${invitationInstitution}:</b> ${inviteBean.invitationInstitution}</p>
         <p><b>${unit}:</b> ${inviteBean.unit.name} (${inviteBean.unit.acronym})</p>
         <p><b>${reason}:</b> ${inviteBean.reasonName} - ${inviteBean.reasonDescription}</p>
         <p><b>${startDate}:</b> ${inviteBean.getStartDateFormatted()}</p>
@@ -70,7 +68,7 @@
         <div class="form-group">
           <label for="gender">${gender}</label>
           <select id="gender" name="gender">
-            <option value="">--Please Select</option>
+            <option value=""><spring:message code='label.option.select'/></option>
             <c:forEach var="gender" items="${genderEnum}">
               <option value="${gender}">${gender}</option>
             </c:forEach>
@@ -80,7 +78,7 @@
         <div class="form-group">
           <label for="idDocumentType">${idDocumentType}</label>
           <select id="idDocumentType" name="idDocumentType">
-            <option value="">--Please Select</option>
+            <option value=""><spring:message code='label.option.select'/></option>
             <c:forEach var="type" items="${IDDocumentTypes}">
               <option value="${type}">${type}</option>
             </c:forEach>

@@ -4,14 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ext.users.domain.Invite;
+import org.fenixedu.ext.users.domain.InviteConfiguration;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
-import org.fenixedu.ext.users.ui.exception.UnauthorisedUserException;
 import org.fenixedu.ext.users.ui.service.ExternalInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -60,7 +59,7 @@ public class InviteController {
         //TODO: remove this little hack very soon
         service.populateReasonsHACK();
 
-        model.addAttribute("reasons", Bennu.getInstance().getReasonSet());
+        model.addAttribute("reasons", InviteConfiguration.getInstance().getReasonSet());
         model.addAttribute("units", service.getUnits());
         model.addAttribute("inviteBean", new InviteBean());
 
@@ -90,7 +89,7 @@ public class InviteController {
     public String confirmInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
         if (!Authenticate.getUser().equals(invite.getCreator())) {
-            throw new UnauthorisedUserException();
+            //TODO: throw new UnauthorisedUserException();
         }
 
         //TODO: check state
@@ -109,7 +108,7 @@ public class InviteController {
     public String rejectInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
         if (!Authenticate.getUser().equals(invite.getCreator())) {
-            throw new UnauthorisedUserException();
+            //TODO: throw new UnauthorisedUserException();
         }
 
         //TODO: check state

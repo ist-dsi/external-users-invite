@@ -32,7 +32,7 @@
 </c:if>
 
 <c:if test="${! emptyInvites}">
-
+  <%-- TODO: design (buttons also) --%>
   <c:if test="${empty completedInvites}">
     <div class="alert alert-success">
       <p><spring:message code='label.completed.invites.empty'/></p>
@@ -69,19 +69,19 @@
           <c:forEach items="${completedInvites}" var="invite">
             <tr>
               <td>${invite.creator.profile.fullName}</td>
-              <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.creationTime.toString('dd/MM/YYY HH:mm')}</td>
               <td>${invite.givenName} (${invite.email})</td>
-              <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.period.start.toString('dd/MM/YYY HH:mm')} - ${invite.period.end.toString('dd/MM/YYY HH:mm')}</td>
               <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
                   <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="${pageContext.request.contextPath}${action}/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'><spring:message code='button.accept'/></a>
                   <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="${pageContext.request.contextPath}${action}/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'><spring:message code='button.reject'/></a>
                   <button type="button" class="btn btn-default details-button"
-                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}"
-                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}"
+                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd/MM/YYY HH:mm')}"
+                    data-start="${invite.period.start.toString('dd/MM/YYY HH:mm')}" data-end="${invite.period.end.toString('dd/MM/YYY HH:mm')}"
                     data-reason="${invite.reasonName} - ${invite.reasonDescription}"
-                    data-invitationinstitution="${invite.invitationInstitution}" data-unit="${invite.unit.name} (${invite.unit.acronym})"
+                    data-unit="${invite.unit.name} (${invite.unit.acronym})"
                     data-state="${invite.state.localizedName}"
                     data-name="${invite.givenName}" data-familynames="${invite.familyNames}"
                     data-email="${invite.email}" data-contact="${invite.contact}"   data-contactsos="${invite.contactSOS}"
@@ -131,17 +131,17 @@
           <c:forEach items="${notCompletedInvites}" var="invite">
             <tr>
               <td>${invite.creator.profile.fullName}</td>
-              <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.creationTime.toString('dd/MM/YYY HH:mm')}</td>
               <td>${invite.givenName} (${invite.email})</td>
-              <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.period.start.toString('dd/MM/YYY HH:mm')} - ${invite.period.end.toString('dd/MM/YYY HH:mm')}</td>
               <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
                   <button type="button" class="btn btn-default details-button"
-                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}"
-                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}"
+                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd/MM/YYY HH:mm')}"
+                    data-start="${invite.period.start.toString('dd/MM/YYY HH:mm')}" data-end="${invite.period.end.toString('dd/MM/YYY HH:mm')}"
                     data-reason="${invite.reasonName} - ${invite.reasonDescription}"
-                    data-invitationinstitution="${invite.invitationInstitution}" data-unit="${invite.unit.name} (${invite.unit.acronym})"
+                    data-unit="${invite.unit.name} (${invite.unit.acronym})"
                     data-state="${invite.state.localizedName}"
                     data-name="${invite.givenName}" data-familynames="${invite.familyNames}"
                     data-email="${invite.email}" data-contact="${invite.contact}"   data-contactsos="${invite.contactSOS}"
@@ -191,17 +191,17 @@
           <c:forEach items="${confirmedInvites}" var="invite">
             <tr>
               <td>${invite.creator.profile.fullName}</td>
-              <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.creationTime.toString('dd/MM/YYY HH:mm')}</td>
               <td>${invite.givenName} (${invite.email})</td>
-              <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.period.start.toString('dd/MM/YYY HH:mm')} - ${invite.period.end.toString('dd/MM/YYY HH:mm')}</td>
               <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
                   <button type="button" class="btn btn-default details-button"
-                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}"
-                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}"
+                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd/MM/YYY HH:mm')}"
+                    data-start="${invite.period.start.toString('dd/MM/YYY HH:mm')}" data-end="${invite.period.end.toString('dd/MM/YYY HH:mm')}"
                     data-reason="${invite.reasonName} - ${invite.reasonDescription}"
-                    data-invitationinstitution="${invite.invitationInstitution}" data-unit="${invite.unit.name} (${invite.unit.acronym})"
+                    data-unit="${invite.unit.name} (${invite.unit.acronym})"
                     data-state="${invite.state.localizedName}"
                     data-name="${invite.givenName}" data-familynames="${invite.familyNames}"
                     data-email="${invite.email}" data-contact="${invite.contact}"   data-contactsos="${invite.contactSOS}"
@@ -251,17 +251,17 @@
           <c:forEach items="${rejectedInvites}" var="invite">
             <tr>
               <td>${invite.creator.profile.fullName}</td>
-              <td>${invite.creationTime.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.creationTime.toString('dd/MM/YYY HH:mm')}</td>
               <td>${invite.givenName} (${invite.email})</td>
-              <td>${invite.period.start.toString('dd-MM-YYY HH:mm')} - ${invite.period.end.toString('dd-MM-YYY HH:mm')}</td>
+              <td>${invite.period.start.toString('dd/MM/YYY HH:mm')} - ${invite.period.end.toString('dd/MM/YYY HH:mm')}</td>
               <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
                   <button type="button" class="btn btn-default details-button"
-                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd-MM-YYY HH:mm')}"
-                    data-start="${invite.period.start.toString('dd-MM-YYY HH:mm')}" data-end="${invite.period.end.toString('dd-MM-YYY HH:mm')}"
+                    data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd/MM/YYY HH:mm')}"
+                    data-start="${invite.period.start.toString('dd/MM/YYY HH:mm')}" data-end="${invite.period.end.toString('dd/MM/YYY HH:mm')}"
                     data-reason="${invite.reasonName} - ${invite.reasonDescription}"
-                    data-invitationinstitution="${invite.invitationInstitution}" data-unit="${invite.unit.name} (${invite.unit.acronym})"
+                    data-unit="${invite.unit.name} (${invite.unit.acronym})"
                     data-state="${invite.state.localizedName}"
                     data-name="${invite.givenName}" data-familynames="${invite.familyNames}"
                     data-email="${invite.email}" data-contact="${invite.contact}"   data-contactsos="${invite.contactSOS}"
@@ -304,13 +304,6 @@
           <label class="col-sm-4 control-label"><b><spring:message code='label.creation.time'/></b></label>
           <div class="col-sm-8">
             <div class="information creationtime"></div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="col-sm-4 control-label"><b><spring:message code='label.invitation.institution'/></b></label>
-          <div class="col-sm-8">
-            <div class="information invitationinstitution"></div>
           </div>
         </div>
 
@@ -439,7 +432,7 @@ $(function(){
   $(".details-button").on("click", function(evt){
     var e = $(evt.target);
 
-    ['creator','creationtime','invitationinstitution','unit','start','end','reason','state','name','familynames','gender','email','iddocumenttype','iddocumentnumber','invitedinstitutionname','invitedinstitutionaddress','contact','contactsos'].map(function(x){
+    ['creator','creationtime','unit','start','end','reason','state','name','familynames','gender','email','iddocumenttype','iddocumentnumber','invitedinstitutionname','invitedinstitutionaddress','contact','contactsos'].map(function(x){
       $("#modal ." + x).html(e.data(x));
     });
 

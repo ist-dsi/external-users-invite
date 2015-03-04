@@ -25,10 +25,9 @@ public class Invite extends Invite_Base {
         }
     };
 
-    public Invite(User creator, String givenName, String familyNames, Gender gender, String email, String invitationInstitution,
-            Interval period, Reason reason, String otherReason, Unit unit, String idDocumentNumber,
-            IDDocumentType idDocumentType, String invitedInstitutionAddress, String invitedInstitutionName, String contact,
-            String contactSOS) {
+    public Invite(User creator, String givenName, String familyNames, Gender gender, String email, Interval period,
+            Reason reason, String otherReason, Unit unit, String idDocumentNumber, IDDocumentType idDocumentType,
+            String invitedInstitutionAddress, String invitedInstitutionName, String contact, String contactSOS) {
 
         setCreator(creator);
         setBennu(Bennu.getInstance());
@@ -36,7 +35,6 @@ public class Invite extends Invite_Base {
         setFamilyNames(familyNames);
         setGender(gender);
         setEmail(email);
-        setInvitationInstitution(invitationInstitution);
         setPeriod(period);
         setReason(reason);
         setOtherReason(otherReason);

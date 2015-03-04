@@ -20,7 +20,6 @@ public class InviteBean {
     private String familyNames;
     private Gender gender;
     private String email;
-    private String invitationInstitution;
     private String startDate;
     private String endDate;
     private String idDocumentNumber;
@@ -51,14 +50,6 @@ public class InviteBean {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getInvitationInstitution() {
-        return invitationInstitution;
-    }
-
-    public void setInvitationInstitution(String invitationInstitution) {
-        this.invitationInstitution = invitationInstitution;
     }
 
     public String getIdDocumentNumber() {
@@ -220,7 +211,6 @@ public class InviteBean {
         this.familyNames = invite.getFamilyNames();
         this.gender = invite.getGender();
         this.email = invite.getEmail();
-        this.invitationInstitution = invite.getInvitationInstitution();
         this.creator = invite.getCreator();
         this.otherReason = invite.getOtherReason();
         this.reasonName = invite.getReasonName();
@@ -246,7 +236,6 @@ public class InviteBean {
         private final String familyNames;
         private final Gender gender;
         private final String email;
-        private final String invitationInstitution;
         private final String startDate;
         private final String endDate;
         private final String idDocumentNumber;
@@ -266,7 +255,6 @@ public class InviteBean {
             this.familyNames = inviteBean.getFamilyNames();
             this.gender = inviteBean.getGender();
             this.email = inviteBean.getEmail();
-            this.invitationInstitution = inviteBean.getInvitationInstitution();
             this.startDate = inviteBean.getStartDate();
             this.endDate = inviteBean.getEndDate();
             this.reason = inviteBean.getReason();
@@ -292,9 +280,8 @@ public class InviteBean {
 
             Interval period = new Interval(startDateDT, endDateDT);
 
-            return new Invite(creator, givenName, familyNames, gender, email, invitationInstitution, period, reason, otherReason,
-                    unit, idDocumentNumber, idDocumentType, invitedInstitutionName, invitedInstitutionAddress, contact,
-                    contactSOS);
+            return new Invite(creator, givenName, familyNames, gender, email, period, reason, otherReason, unit,
+                    idDocumentNumber, idDocumentType, invitedInstitutionName, invitedInstitutionAddress, contact, contactSOS);
         }
     }
 }

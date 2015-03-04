@@ -17,11 +17,15 @@ import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.ext.users.domain.Invite;
+import org.fenixedu.ext.users.domain.InviteConfiguration;
 import org.fenixedu.ext.users.domain.InviteState;
 import org.fenixedu.ext.users.domain.Reason;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
+import org.fenixedu.ext.users.ui.exception.ExpiredInviteException;
+import org.fenixedu.ext.users.ui.exception.ExternalInviteException;
 import org.fenixedu.ext.users.ui.exception.NonUniqueInviteHashException;
 import org.fenixedu.ext.users.ui.exception.UnexistentInviteHashException;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -34,6 +38,10 @@ public class ExternalInviteService {
 
     @Autowired
     MessageSource messageSource;
+
+    private String getInstitutionName() {
+        return Bennu.getInstance().getInstitutionUnit().getPresentationName();
+    }
 
     private List<Invite> filterInvitesByState(List<Invite> invites, InviteState st) {
         return invites.stream().filter(i -> i.getState().equals(st)).sorted(Invite.COMPARATOR_BY_CREATION_TIME)
@@ -74,18 +82,19 @@ public class ExternalInviteService {
         String bcc = invite.getEmail();
 
         String subject =
-                messageSource.getMessage("external.user.invite.message.subject", new Object[] {
-                        invite.getInvitationInstitution(), Authenticate.getUser().getProfile().getFullName() }, I18N.getLocale());
+                messageSource.getMessage("external.user.invite.message.subject", new Object[] { getInstitutionName(),
+                        Authenticate.getUser().getProfile().getFullName() }, I18N.getLocale());
 
         String link =
                 CoreConfiguration.getConfiguration().applicationUrl() + "/public-external-invite/completeInvite/"
                         + invite.getHash();
 
         String body =
-                messageSource.getMessage("external.user.invite.message.body", new Object[] {
-                        invite.getCreator().getProfile().getFullName(), invite.getInvitationInstitution(),
-                        invite.getReasonName(), link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                        invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale());
+                messageSource.getMessage(
+                        "external.user.invite.message.body",
+                        new Object[] { invite.getCreator().getProfile().getFullName(), getInstitutionName(),
+                                invite.getReasonName(), link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
+                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale()); //TODO: should inform about expiration date?
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -124,12 +133,12 @@ public class ExternalInviteService {
         person.setGender(invite.getGender());
         invite.setInvited(userProfile);
 
-        sendConfirmationMessage(invite);
+        sendConfirmationMessage(invite, person);
 
         return person;
     }
 
-    private void sendConfirmationMessage(Invite invite) {
+    private void sendConfirmationMessage(Invite invite, Person person) {
         String bcc = invite.getEmail();
 
         String subject =
@@ -139,10 +148,11 @@ public class ExternalInviteService {
         String link = "https://id.ist.utl.pt";
 
         String body =
-                messageSource.getMessage("external.user.confirmation.message.body", new Object[] {
-                        invite.getCreator().getProfile().getFullName(), invite.getInvitationInstitution(),
-                        invite.getReasonName(), link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                        invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale());
+                messageSource
+                        .getMessage("external.user.confirmation.message.body", new Object[] {
+                                invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(),
+                                link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
+                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm"), person.getUsername() }, I18N.getLocale());
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -163,10 +173,11 @@ public class ExternalInviteService {
         String subject = messageSource.getMessage("external.user.rejection.message.subject", new Object[] {}, I18N.getLocale());
 
         String body =
-                messageSource.getMessage("external.user.rejection.message.body", new Object[] {
-                        invite.getCreator().getProfile().getFullName(), invite.getInvitationInstitution(),
-                        invite.getReasonName(), invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                        invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale());
+                messageSource.getMessage(
+                        "external.user.rejection.message.body",
+                        new Object[] { invite.getCreator().getProfile().getFullName(), getInstitutionName(),
+                                invite.getReasonName(), invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
+                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale());
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -174,7 +185,7 @@ public class ExternalInviteService {
         new Message(Bennu.getInstance().getSystemSender(), null, null, subject, body, bcc);
     }
 
-    public Invite getInviteFromHash(String hash) throws NonUniqueInviteHashException, UnexistentInviteHashException {
+    public Invite getInviteFromHash(String hash) throws ExternalInviteException {
         Set<Invite> matchingInvites =
                 Bennu.getInstance().getInviteSet().stream().filter(i -> i.getHash().equals(hash)).collect(Collectors.toSet());
 
@@ -186,13 +197,23 @@ public class ExternalInviteService {
             throw new UnexistentInviteHashException();
         }
 
-        return matchingInvites.iterator().next();
+        Invite hit = matchingInvites.iterator().next();
+
+        if (hasExpired(hit)) {
+            throw new ExpiredInviteException();
+        }
+
+        return hit;
+    }
+
+    private boolean hasExpired(Invite invite) {
+        return DateTime.now().isAfter(invite.getCreationTime().plusDays(InviteConfiguration.getInstance().getExpirationDays()));
     }
 
     //TODO: remove this little hack very soon
     @Atomic(mode = TxMode.WRITE)
     public void populateReasonsHACK() {
-        Set<Reason> reasons = Bennu.getInstance().getReasonSet();
+        Set<Reason> reasons = InviteConfiguration.getInstance().getReasonSet();
         if (reasons.isEmpty()) {
             System.out.println("adding reasons because yes");
             reasons.add(new Reason("thesis", "descThesis"));

@@ -20,7 +20,6 @@ ${portal.toolkit()}
 
 <spring:message code='label.given.name' var='givenName'/>
 <spring:message code='label.email' var='email'/>
-<spring:message code='label.invitation.institution' var='invitationInstitution'/>
 <spring:message code='label.date.start' var='startDate'/>
 <spring:message code='label.date.end' var='endDate'/>
 <spring:message code='label.reason' var='reason'/>
@@ -50,11 +49,6 @@ ${portal.toolkit()}
     </div>
 
     <div class="form-group">
-      <label for="invitationInstitution">${invitationInstitution}</label>
-      <input type="text" class="form-control" id="invitationInstitution" name="invitationInstitution" placeholder="${invitationInstitution}" required="required" value="${inviteBean.invitationInstitution}"/>
-    </div>
-
-    <div class="form-group">
       <label for="startDate">${startDate}</label>
       <input type="text" bennu-datetime class="form-control" id="startDate" name="startDate" placeholder="${startDate}" required="required" value="${inviteBean.startDate}"/>
     </div>
@@ -67,7 +61,7 @@ ${portal.toolkit()}
     <div class="form-group">
       <label for="reason">${reason}</label>
       <select id="reason" name="reason">
-        <option value="" label="__--Please Select"/>
+        <option value=""><spring:message code='label.option.select'/></option>
         <c:forEach var="reason" items="${reasons}">
           <option value="${reason.externalId}">${reason.name} - ${reason.description}</option>
         </c:forEach>
@@ -82,7 +76,7 @@ ${portal.toolkit()}
     <div class="form-group">
       <label for="unit">${unit}</label>
       <select id="unit" name="unit">
-        <option value="" label="__--Please Select"/>
+        <option value=""><spring:message code='label.option.select'/></option>
         <c:forEach var="unit" items="${units}">
           <option value="${unit.externalId}">${unit.name} <c:if test="${! empty unit.acronym}">(${unit.acronym})</c:if></option>
         </c:forEach>
