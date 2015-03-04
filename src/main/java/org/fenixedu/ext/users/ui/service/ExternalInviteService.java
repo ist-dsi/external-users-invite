@@ -16,11 +16,11 @@ import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.ext.users.ExternalInviteConfiguration;
 import org.fenixedu.ext.users.domain.Invite;
-import org.fenixedu.ext.users.domain.InviteConfiguration;
 import org.fenixedu.ext.users.domain.InviteState;
-import org.fenixedu.ext.users.domain.Reason;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
+import org.fenixedu.ext.users.ui.bean.ReasonBean;
 import org.fenixedu.ext.users.ui.exception.ExpiredInviteException;
 import org.fenixedu.ext.users.ui.exception.ExternalInviteException;
 import org.fenixedu.ext.users.ui.exception.NonUniqueInviteHashException;
@@ -207,20 +207,8 @@ public class ExternalInviteService {
     }
 
     private boolean hasExpired(Invite invite) {
-        return DateTime.now().isAfter(invite.getCreationTime().plusDays(InviteConfiguration.getInstance().getExpirationDays()));
-    }
-
-    //TODO: remove this little hack very soon
-    @Atomic(mode = TxMode.WRITE)
-    public void populateReasonsHACK() {
-        Set<Reason> reasons = InviteConfiguration.getInstance().getReasonSet();
-        if (reasons.isEmpty()) {
-            System.out.println("adding reasons because yes");
-            reasons.add(new Reason("thesis", "descThesis"));
-            reasons.add(new Reason("class", "descClass"));
-            reasons.add(new Reason("lunch", "descLunch"));
-            reasons.add(new Reason("other", "descOther"));
-        }
+        return DateTime.now().isAfter(
+                invite.getCreationTime().plusDays(ExternalInviteConfiguration.getConfiguration().getExpirationDays()));
     }
 
     public List<Unit> getUnits() {
@@ -251,4 +239,10 @@ public class ExternalInviteService {
         return Bennu.getInstance().getDepartmentsSet().stream().map(d -> d.getDepartmentUnit()).distinct()
                 .collect(Collectors.toList());
     }
+
+    @Atomic(mode = TxMode.WRITE)
+    public void addReason(ReasonBean reasonBean) {
+        Bennu.getInstance().getReasonSet().add(new ReasonBean.Builder(reasonBean).build());
+    }
+
 }

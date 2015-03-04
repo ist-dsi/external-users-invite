@@ -1,7 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
-
 <div class="page-header">
   <h1><spring:message code='title.invites'/></h1>
 </div>
@@ -288,8 +287,8 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close"><span class="sr-only"><spring:message code="button.close"/></span></button>
-        <h3 class="modal-title">"label.details"</h3>
-        <small class="explanation">"label.modal.proposals.details"</small>
+        <h3 class="modal-title">_label.details</h3>
+        <small class="explanation">_label.modal.proposals.details</small>
       </div>
       <div class="modal-body">
 

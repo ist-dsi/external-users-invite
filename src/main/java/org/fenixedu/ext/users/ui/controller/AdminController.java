@@ -8,7 +8,9 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.ext.users.ExternalInviteConfiguration;
 import org.fenixedu.ext.users.domain.Invite;
+import org.fenixedu.ext.users.ui.bean.ReasonBean;
 import org.fenixedu.ext.users.ui.service.ExternalInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@SpringFunctionality(app = InviteController.class, title = "title.invites.admin", accessGroup = "logged")
+@SpringFunctionality(app = InviteController.class, title = "title.invites.admin", accessGroup = "#managers")
 @RequestMapping("/admin-external-invite")
 public class AdminController {
 
@@ -72,4 +74,23 @@ public class AdminController {
         return "redirect:/admin-external-invite";
     }
 
+    @RequestMapping(value = "/manageConfigurations", method = RequestMethod.GET)
+    public String manageConfigurations(Model model) {
+
+        model.addAttribute("reasonbean", new ReasonBean());
+        model.addAttribute("reasons", Bennu.getInstance().getReasonSet());
+        model.addAttribute("expirationDays", ExternalInviteConfiguration.getConfiguration().getExpirationDays());
+
+        return "configuration/list";
+    }
+
+    @RequestMapping(value = "/addReason", method = RequestMethod.POST)
+    public String addReason(ReasonBean reasonBean) {
+
+        //TODO: validate input
+
+        service.addReason(reasonBean);
+
+        return "redirect:/admin-external-invite/manageConfigurations";
+    }
 }

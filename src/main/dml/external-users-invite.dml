@@ -30,10 +30,6 @@ class Reason {
     String description;
 }
 
-class InviteConfiguration {
-    public int expirationDays;
-}
-
 //access groups relationships definition
 
 // root relationships
@@ -46,21 +42,12 @@ relation BennuInvite {
     }
 }
 
-relation InviteConfigurationReason {
-    protected InviteConfiguration playsRole inviteConfiguration {
+relation BennuReason {
+    protected .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
         multiplicity 1..1;
     }
     public Reason playsRole reason {
         multiplicity 0..*;
-    }
-}
-
-relation BennuInviteConfiguration {
-    public .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
-        multiplicity 1..1;
-    }
-    public InviteConfiguration playsRole inviteConfiguration {
-        multiplicity 1..1;
     }
 }
 
