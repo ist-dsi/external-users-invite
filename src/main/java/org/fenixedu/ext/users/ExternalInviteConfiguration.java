@@ -10,7 +10,7 @@ public class ExternalInviteConfiguration {
     public interface ConfigurationProperties {
 
         @ConfigurationProperty(key = "external.invite.expiration.days", description = "External invite expiration time in days",
-                defaultValue = "1")
+                defaultValue = "30")
         public Integer getExpirationDays();
     }
 

@@ -33,7 +33,7 @@
 <c:if test="${! emptyInvites}">
   <%-- TODO: design (buttons also) --%>
   <c:if test="${empty completedInvites}">
-    <div class="alert alert-success">
+    <div class="alert alert-info">
       <p><spring:message code='label.completed.invites.empty'/></p>
     </div>
   </c:if>
@@ -74,8 +74,8 @@
               <td>${invite.state.localizedName}</td>
               <td>
                 <div class="btn-group btn-group-xs">
-                  <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="${pageContext.request.contextPath}${action}/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'><spring:message code='button.accept'/></a>
-                  <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="${pageContext.request.contextPath}${action}/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'><spring:message code='button.reject'/></a>
+                  <a data-base-url="${pageContext.request.contextPath}/external-users-invite/confirmInvite/" href="${pageContext.request.contextPath}/external-users-invite/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'><spring:message code='button.accept'/></a>
+                  <a data-base-url="${pageContext.request.contextPath}/external-users-invite/rejectInvite/" href="${pageContext.request.contextPath}/external-users-invite/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'><spring:message code='button.reject'/></a>
                   <button type="button" class="btn btn-default details-button"
                     data-creator="${invite.creator.profile.fullName}" data-creationtime="${invite.creationTime.toString('dd/MM/YYY HH:mm')}"
                     data-start="${invite.period.start.toString('dd/MM/YYY HH:mm')}" data-end="${invite.period.end.toString('dd/MM/YYY HH:mm')}"
@@ -412,8 +412,8 @@
         </div>
 
         <div id='action-buttons' class="col-sm-offset-4">
-          <a data-base-url="${pageContext.request.contextPath}${action}/confirmInvite/" href="" class="btn btn-success" id='accept-btn'><spring:message code='button.accept'/></a>
-          <a data-base-url="${pageContext.request.contextPath}${action}/rejectInvite/" href="" class="btn btn-danger" id='reject-btn'><spring:message code='button.reject'/></a>
+          <a data-base-url="${pageContext.request.contextPath}/external-users-invite/confirmInvite/" href="" class="btn btn-success" id='accept-btn'><spring:message code='button.accept'/></a>
+          <a data-base-url="${pageContext.request.contextPath}/external-users-invite/rejectInvite/" href="" class="btn btn-danger" id='reject-btn'><spring:message code='button.reject'/></a>
         </div>
 
       </div>

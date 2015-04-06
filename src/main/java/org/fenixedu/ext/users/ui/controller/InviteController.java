@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
@@ -48,7 +47,6 @@ public class InviteController {
 
         model.addAllAttributes(redirectAttr.getFlashAttributes());
         model.addAttribute("action", "/external-users-invite");
-        model.addAttribute("admin", false);
 
         return "external-users-invite/list";
     }
@@ -56,7 +54,7 @@ public class InviteController {
     @RequestMapping(value = "/newInvite", method = RequestMethod.GET)
     public String startInvite(Model model) {
 
-        model.addAttribute("reasons", Bennu.getInstance().getReasonSet());
+        model.addAttribute("reasons", service.getReasons());
         model.addAttribute("units", service.getUnits());
         model.addAttribute("inviteBean", new InviteBean());
 

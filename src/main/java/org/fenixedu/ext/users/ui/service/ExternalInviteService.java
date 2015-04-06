@@ -19,6 +19,7 @@ import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.ext.users.ExternalInviteConfiguration;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.domain.InviteState;
+import org.fenixedu.ext.users.domain.Reason;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
 import org.fenixedu.ext.users.ui.bean.ReasonBean;
 import org.fenixedu.ext.users.ui.exception.ExpiredInviteException;
@@ -123,6 +124,8 @@ public class ExternalInviteService {
     @Atomic(mode = TxMode.WRITE)
     public Person confirmInvite(Invite invite, boolean admin) {
 
+        //TODO: check expiration date
+
         invite.setState(admin ? InviteState.CONFIRMED_BY_MANAGER : InviteState.CONFIRMED_BY_CREATOR);
 
         UserProfile userProfile = new UserProfile(invite.getGivenName(), invite.getFamilyNames(), null, invite.getEmail(), null);
@@ -163,6 +166,9 @@ public class ExternalInviteService {
 
     @Atomic(mode = TxMode.WRITE)
     public void rejectInvite(Invite invite, boolean admin) {
+
+        //TODO: check expiration date
+
         invite.setState(admin ? InviteState.REJECTED_BY_MANAGER : InviteState.REJECTED_BY_CREATOR);
         sendRejectionMessage(invite);
     }
@@ -243,6 +249,25 @@ public class ExternalInviteService {
     @Atomic(mode = TxMode.WRITE)
     public void addReason(ReasonBean reasonBean) {
         Bennu.getInstance().getReasonSet().add(new ReasonBean.Builder(reasonBean).build());
+    }
+
+    @Atomic(mode = TxMode.WRITE)
+    public void deleteReason(Reason reason) {
+        reason.delete();
+    }
+
+    @Atomic(mode = TxMode.WRITE)
+    public void disableReason(Reason reason) {
+        reason.setEnabled(false);
+    }
+
+    @Atomic(mode = TxMode.WRITE)
+    public void enableReason(Reason reason) {
+        reason.setEnabled(true);
+    }
+
+    public Set<Reason> getReasons() {
+        return Bennu.getInstance().getReasonSet().stream().filter(r -> r.getEnabled()).collect(Collectors.toSet());
     }
 
 }

@@ -15,8 +15,8 @@ class Invite {
     public Interval period;
     public String idDocumentNumber;
     public IDDocumentType idDocumentType;
-    public String invitedInstitutionName; //TODO: institution/organization?
-    public String invitedInstitutionAddress; //TODO: institution/organization?
+    public String invitedInstitutionName; 
+    public String invitedInstitutionAddress;
     public String contact;
     public String contactSOS;
     public InviteState state;
@@ -28,6 +28,7 @@ class Invite {
 class Reason {
     String name;
     String description;
+    boolean enabled;
 }
 
 //access groups relationships definition

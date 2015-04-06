@@ -1,19 +1,24 @@
 package org.fenixedu.ext.users.ui.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ext.users.ExternalInviteConfiguration;
 import org.fenixedu.ext.users.domain.Invite;
+import org.fenixedu.ext.users.domain.Reason;
 import org.fenixedu.ext.users.ui.bean.ReasonBean;
 import org.fenixedu.ext.users.ui.service.ExternalInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,21 +36,22 @@ public class AdminController {
     @RequestMapping
     public String listInvites(Model model) {
 
-        List<Invite> invites =
-                Bennu.getInstance().getInviteSet().stream().sorted(Invite.COMPARATOR_BY_CREATION_TIME)
-                        .collect(Collectors.toList());
+        Bennu bennu = Bennu.getInstance();
 
-        model.addAttribute("action", "/admin-external-invite");
-        model.addAttribute("admin", true);
+        List<Invite> invites =
+                bennu.getInviteSet().stream().sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
         model.addAttribute("invites", invites);
 
-        return "external-users-invite/list";
+        Set<Reason> reasons = bennu.getReasonSet();
+        model.addAttribute("reasons", reasons);
+        model.addAttribute("expirationDays", ExternalInviteConfiguration.getConfiguration().getExpirationDays());
+
+        return "admin/list";
     }
 
     @RequestMapping(value = "/confirmInvite/{oid}", method = RequestMethod.GET)
     public String confirmInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
-        //TODO: check creator = auth.getUser
         //TODO: check state
 
         Person person = service.confirmInvite(invite, true);
@@ -61,7 +67,6 @@ public class AdminController {
     @RequestMapping(value = "/rejectInvite/{oid}", method = RequestMethod.GET)
     public String rejectInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
-        //TODO: check creator = auth.getUser
         //TODO: check state
 
         service.rejectInvite(invite, true);
@@ -74,23 +79,60 @@ public class AdminController {
         return "redirect:/admin-external-invite";
     }
 
-    @RequestMapping(value = "/manageConfigurations", method = RequestMethod.GET)
-    public String manageConfigurations(Model model) {
+    @RequestMapping(value = "/prepareAddReason", method = RequestMethod.GET)
+    public String prepareAddReason(Model model) {
 
-        model.addAttribute("reasonbean", new ReasonBean());
-        model.addAttribute("reasons", Bennu.getInstance().getReasonSet());
-        model.addAttribute("expirationDays", ExternalInviteConfiguration.getConfiguration().getExpirationDays());
+        model.addAttribute("reasonBean", new ReasonBean());
 
-        return "configuration/list";
+        return "admin/createReason";
     }
 
     @RequestMapping(value = "/addReason", method = RequestMethod.POST)
-    public String addReason(ReasonBean reasonBean) {
+    public String addReason(@ModelAttribute ReasonBean reasonBean, RedirectAttributes redirectAttrs) {
 
-        //TODO: validate input
+        ArrayList<String> errors = new ArrayList<String>();
+
+        if (reasonBean.getName().isEmpty()) {
+            errors.add("reason.name.required");
+        }
+        if (reasonBean.getDescription().isEmpty()) {
+            errors.add("reason.description.required");
+        }
+
+        if (!errors.isEmpty()) {
+            redirectAttrs.addFlashAttribute("errors", errors);
+            return "redirect:/admin-external-invite/prepareAddReason";
+        }
 
         service.addReason(reasonBean);
 
-        return "redirect:/admin-external-invite/manageConfigurations";
+        return "redirect:/admin-external-invite";
+    }
+
+    @RequestMapping(value = "/deleteReason/{oid}")
+    public String deleteReason(@PathVariable("oid") Reason reason, RedirectAttributes redirectAttrs) {
+        try {
+            service.deleteReason(reason);
+        } catch (DomainException e) {
+            redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getLocalizedMessage()));
+        }
+
+        return "redirect:/admin-external-invite";
+    }
+
+    @RequestMapping(value = "/disableReason/{oid}")
+    public String disableReason(@PathVariable("oid") Reason reason) {
+
+        service.disableReason(reason);
+
+        return "redirect:/admin-external-invite";
+    }
+
+    @RequestMapping(value = "/enableReason/{oid}")
+    public String enableReason(@PathVariable("oid") Reason reason) {
+
+        service.enableReason(reason);
+
+        return "redirect:/admin-external-invite";
     }
 }

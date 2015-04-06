@@ -1,5 +1,6 @@
 package org.fenixedu.ext.users.ui.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.fenixedu.academic.domain.person.Gender;
@@ -15,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @SpringFunctionality(app = InviteController.class, title = "title.invites.public", accessGroup = "anyone")
 @RequestMapping("/public-external-invite")
@@ -42,9 +44,51 @@ public class ExternalUserController {
     }
 
     @RequestMapping(value = "/submitCompletion", method = RequestMethod.POST)
-    public String submitCompletion(InviteBean inviteBean, Model model) {
+    public String submitCompletion(InviteBean inviteBean, Model model, RedirectAttributes redirectAttrs) {
 
-        //TODO: validate fields
+        ArrayList<String> errors = new ArrayList<String>();
+
+        if (inviteBean.getGivenName() == null || inviteBean.getGivenName().isEmpty()) {
+            errors.add("public.given.name.required");
+        }
+
+        if (inviteBean.getFamilyNames() == null || inviteBean.getFamilyNames().isEmpty()) {
+            errors.add("public.family.names.required");
+        }
+
+        if (inviteBean.getGender() == null) {
+            errors.add("public.gender.required");
+        }
+
+        if (inviteBean.getIdDocumentType() == null) {
+            errors.add("public.document.type.required");
+        }
+
+        if (inviteBean.getIdDocumentNumber() == null || inviteBean.getIdDocumentNumber().isEmpty()) {
+            errors.add("public.document.number.required");
+        }
+
+        if (inviteBean.getInvitedInstitutionName() == null || inviteBean.getInvitedInstitutionName().isEmpty()) {
+            errors.add("public.institution.name.required");
+        }
+
+        if (inviteBean.getInvitedInstitutionAddress() == null || inviteBean.getInvitedInstitutionAddress().isEmpty()) {
+            errors.add("public.institution.address.required");
+        }
+
+        if (inviteBean.getContact() == null || inviteBean.getContact().isEmpty()) {
+            errors.add("public.contact.required");
+        }
+
+        if (inviteBean.getContactSOS() == null || inviteBean.getContactSOS().isEmpty()) {
+            errors.add("public.contact.sos.required");
+        }
+
+        if (!errors.isEmpty()) {
+            redirectAttrs.addFlashAttribute("errors", errors);
+            return "redirect:/public-external-invite/completeInvite/" + inviteBean.getInvite().getHash();
+        }
+
         Invite invite = service.updateCompletedInvite(inviteBean);
 
         model.addAttribute(
