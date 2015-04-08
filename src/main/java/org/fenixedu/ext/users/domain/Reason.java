@@ -11,7 +11,7 @@ public class Reason extends Reason_Base {
         super();
         setName(name);
         setDescription(description);
-        setEnabled(true);
+        setActive(true);
         setBennu(Bennu.getInstance());
     }
 

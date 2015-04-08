@@ -290,7 +290,7 @@
           <tr>
             <th><spring:message code='label.name'/></th>
             <th><spring:message code='label.description'/></th>
-            <th><spring:message code='label.enabled'/></th>
+            <th><spring:message code='label.active'/></th>
           </tr>
         </thead>
         <tbody>
@@ -298,13 +298,13 @@
             <tr>
               <td>${reason.name}</td>
               <td>${reason.description}</td>
-              <td><spring:message code='${reason.enabled ? "label.yes" : "label.no"}'/></td>
+              <td><spring:message code='${reason.active ? "label.yes" : "label.no"}'/></td>
               <td>
-                <c:if test="${reason.enabled}">
-                  <a href="${pageContext.request.contextPath}/admin-external-invite/disableReason/${reason.externalId}" class="btn btn-default"><spring:message code='label.disable'/></a>
+                <c:if test="${reason.active}">
+                  <a href="${pageContext.request.contextPath}/admin-external-invite/disableReason/${reason.externalId}" class="btn btn-default"><spring:message code='label.deactivate'/></a>
                 </c:if>
-                <c:if test="${! reason.enabled}">
-                  <a href="${pageContext.request.contextPath}/admin-external-invite/enableReason/${reason.externalId}" class="btn btn-default"><spring:message code='label.enable'/></a>
+                <c:if test="${! reason.active}">
+                  <a href="${pageContext.request.contextPath}/admin-external-invite/enableReason/${reason.externalId}" class="btn btn-default"><spring:message code='label.activate'/></a>
                 </c:if>
                 <a href="${pageContext.request.contextPath}/admin-external-invite/deleteReason/${reason.externalId}" class="btn btn-default"><spring:message code='label.delete'/></a>
               </td>

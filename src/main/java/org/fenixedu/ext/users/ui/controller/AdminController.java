@@ -123,7 +123,7 @@ public class AdminController {
     @RequestMapping(value = "/disableReason/{oid}")
     public String disableReason(@PathVariable("oid") Reason reason) {
 
-        service.disableReason(reason);
+        service.desactivateReason(reason);
 
         return "redirect:/admin-external-invite";
     }
@@ -131,7 +131,7 @@ public class AdminController {
     @RequestMapping(value = "/enableReason/{oid}")
     public String enableReason(@PathVariable("oid") Reason reason) {
 
-        service.enableReason(reason);
+        service.activateReason(reason);
 
         return "redirect:/admin-external-invite";
     }

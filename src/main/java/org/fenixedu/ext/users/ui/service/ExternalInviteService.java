@@ -257,17 +257,17 @@ public class ExternalInviteService {
     }
 
     @Atomic(mode = TxMode.WRITE)
-    public void disableReason(Reason reason) {
-        reason.setEnabled(false);
+    public void desactivateReason(Reason reason) {
+        reason.setActive(false);
     }
 
     @Atomic(mode = TxMode.WRITE)
-    public void enableReason(Reason reason) {
-        reason.setEnabled(true);
+    public void activateReason(Reason reason) {
+        reason.setActive(true);
     }
 
     public Set<Reason> getReasons() {
-        return Bennu.getInstance().getReasonSet().stream().filter(r -> r.getEnabled()).collect(Collectors.toSet());
+        return Bennu.getInstance().getReasonSet().stream().filter(r -> r.getActive()).collect(Collectors.toSet());
     }
 
 }

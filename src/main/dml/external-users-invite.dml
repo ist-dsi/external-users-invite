@@ -28,7 +28,7 @@ class Invite {
 class Reason {
     String name;
     String description;
-    boolean enabled;
+    boolean active;
 }
 
 //access groups relationships definition
