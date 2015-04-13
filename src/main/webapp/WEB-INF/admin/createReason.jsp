@@ -8,6 +8,14 @@
   <p><spring:message code='external.invite.reason.create.well'/></p>
 </div>
 
+<c:if test="${! empty errors}">
+  <div class="alert alert-danger" role="alert">
+    <c:forEach var="error" items="${errors}">
+      <p><spring:message code='error.external.invite.${error}'/></p>
+    </c:forEach>
+  </div>
+</c:if>
+
 <c:if test="${! empty messages}">
   <div class="alert alert-success" role="alert">
     <c:forEach items="${messages}" var="message">

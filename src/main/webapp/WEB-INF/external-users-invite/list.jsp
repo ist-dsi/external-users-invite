@@ -8,6 +8,14 @@
   <p><spring:message code='external.invites.list.well'/></p>
 </div>
 
+<c:if test="${! empty errors}">
+  <div class="alert alert-danger" role="alert">
+    <c:forEach items="${errors}" var="error">
+      <p><spring:message code='error.external.invite.${error}'/></p>
+    </c:forEach>
+  </div>
+</c:if>
+
 <c:if test="${! empty messages}">
   <div class="alert alert-success" role="alert">
     <c:forEach items="${messages}" var="message">
@@ -287,8 +295,8 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close"><span class="sr-only"><spring:message code="button.close"/></span></button>
-        <h3 class="modal-title">_label.details</h3>
-        <small class="explanation">_label.modal.proposals.details</small>
+        <h3 class="modal-title"><spring:message code='modal.title.invite.new'/></h3>
+        <small class="explanation"><spring:message code='modal.title.invite.new.explanation'/></small>
       </div>
       <div class="modal-body">
 

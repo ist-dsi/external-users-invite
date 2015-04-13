@@ -9,12 +9,15 @@ import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import com.google.common.hash.Hashing;
 
 public class Invite extends Invite_Base {
+
+    static String BUNDLE = "resources.ExternalUsersInviteResources";
 
     public final static Comparator<Invite> COMPARATOR_BY_CREATION_TIME = new Comparator<Invite>() {
 
@@ -53,7 +56,7 @@ public class Invite extends Invite_Base {
     }
 
     public String getReasonName() {
-        return this.getReason() != null ? this.getReason().getName() : "Other Reason"; //TODO: fix string
+        return this.getReason() != null ? this.getReason().getName() : BundleUtil.getString(BUNDLE, "reason.other.name");
     }
 
     public String getReasonDescription() {

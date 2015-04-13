@@ -1,5 +1,6 @@
 package org.fenixedu.ext.users.ui.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
+import org.fenixedu.ext.users.ui.exception.UnauthorisedUserException;
 import org.fenixedu.ext.users.ui.service.ExternalInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -66,7 +68,34 @@ public class InviteController {
 
         inviteBean.setCreator(Authenticate.getUser());
 
-        //TODO: validate fields
+        ArrayList<String> errors = new ArrayList<String>();
+
+        if (inviteBean.getGivenName() == null || inviteBean.getGivenName().isEmpty()) {
+            errors.add("given.name.required");
+        }
+        if (inviteBean.getFamilyNames() == null || inviteBean.getFamilyNames().isEmpty()) {
+            errors.add("family.name.required");
+        }
+        if (inviteBean.getEmail() == null || inviteBean.getEmail().isEmpty()) {
+            errors.add("email.required");
+        }
+        if (inviteBean.getStartDate() == null || inviteBean.getStartDate().isEmpty()) {
+            errors.add("date.start.required");
+        }
+        if (inviteBean.getEndDate() == null || inviteBean.getEndDate().isEmpty()) {
+            errors.add("date.end.required");
+        }
+        if (inviteBean.getUnit() == null) {
+            errors.add("unit.required");
+        }
+        if (inviteBean.getReason() == null && (inviteBean.getOtherReason() == null || inviteBean.getOtherReason().isEmpty())) {
+            errors.add("reason.required");
+        }
+
+        if (!errors.isEmpty()) {
+            redirectAttrs.addFlashAttribute("errors", errors);
+            return "redirect:/external-users-invite/newInvite";
+        }
 
         Invite invite = new InviteBean.Builder(inviteBean).build();
 
@@ -83,38 +112,44 @@ public class InviteController {
     @RequestMapping(value = "/confirmInvite/{oid}", method = RequestMethod.GET)
     public String confirmInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
-        if (!Authenticate.getUser().equals(invite.getCreator())) {
-            //TODO: throw new UnauthorisedUserException();
+        try {
+            service.checkInviteAccess(invite);
+
+            //TODO: check state
+
+            Person person = service.confirmInvite(invite, false);
+
+            redirectAttrs.addFlashAttribute(
+                    "messages",
+                    Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.confirm",
+                            new String[] { invite.getGivenName(), invite.getEmail(), person.getUsername() })));
+
+            return "redirect:/external-users-invite";
+        } catch (UnauthorisedUserException e) {
+            redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getClass().getSimpleName()));
+            return "redirect:/external-users-invite";
         }
-
-        //TODO: check state
-
-        Person person = service.confirmInvite(invite, false);
-
-        redirectAttrs.addFlashAttribute(
-                "messages",
-                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.confirm", new String[] {
-                        invite.getGivenName(), invite.getEmail(), person.getUsername() })));
-
-        return "redirect:/external-users-invite";
     }
 
     @RequestMapping(value = "/rejectInvite/{oid}", method = RequestMethod.GET)
     public String rejectInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
-        if (!Authenticate.getUser().equals(invite.getCreator())) {
-            //TODO: throw new UnauthorisedUserException();
+        try {
+            service.checkInviteAccess(invite);
+
+            //TODO: check state
+
+            service.rejectInvite(invite, false);
+
+            redirectAttrs.addFlashAttribute(
+                    "messages",
+                    Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.reject",
+                            new String[] { invite.getGivenName(), invite.getEmail() })));
+
+            return "redirect:/external-users-invite";
+        } catch (UnauthorisedUserException e) {
+            redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getClass().getSimpleName()));
+            return "redirect:/external-users-invite";
         }
-
-        //TODO: check state
-
-        service.rejectInvite(invite, false);
-
-        redirectAttrs.addFlashAttribute(
-                "messages",
-                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.reject", new String[] { invite.getGivenName(),
-                        invite.getEmail() })));
-
-        return "redirect:/external-users-invite";
     }
 }

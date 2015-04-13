@@ -25,6 +25,7 @@ import org.fenixedu.ext.users.ui.bean.ReasonBean;
 import org.fenixedu.ext.users.ui.exception.ExpiredInviteException;
 import org.fenixedu.ext.users.ui.exception.ExternalInviteException;
 import org.fenixedu.ext.users.ui.exception.NonUniqueInviteHashException;
+import org.fenixedu.ext.users.ui.exception.UnauthorisedUserException;
 import org.fenixedu.ext.users.ui.exception.UnexistentInviteHashException;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,7 @@ public class ExternalInviteService {
                         "external.user.invite.message.body",
                         new Object[] { invite.getCreator().getProfile().getFullName(), getInstitutionName(),
                                 invite.getReasonName(), link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale()); //TODO: should inform about expiration date?
+                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale());
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -123,8 +124,6 @@ public class ExternalInviteService {
 
     @Atomic(mode = TxMode.WRITE)
     public Person confirmInvite(Invite invite, boolean admin) {
-
-        //TODO: check expiration date
 
         invite.setState(admin ? InviteState.CONFIRMED_BY_MANAGER : InviteState.CONFIRMED_BY_CREATOR);
 
@@ -166,8 +165,6 @@ public class ExternalInviteService {
 
     @Atomic(mode = TxMode.WRITE)
     public void rejectInvite(Invite invite, boolean admin) {
-
-        //TODO: check expiration date
 
         invite.setState(admin ? InviteState.REJECTED_BY_MANAGER : InviteState.REJECTED_BY_CREATOR);
         sendRejectionMessage(invite);
@@ -268,6 +265,12 @@ public class ExternalInviteService {
 
     public Set<Reason> getReasons() {
         return Bennu.getInstance().getReasonSet().stream().filter(r -> r.getActive()).collect(Collectors.toSet());
+    }
+
+    public void checkInviteAccess(Invite invite) throws UnauthorisedUserException {
+        if (!Authenticate.getUser().equals(invite.getCreator())) {
+            throw new UnauthorisedUserException();
+        }
     }
 
 }
