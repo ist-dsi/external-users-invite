@@ -38,10 +38,6 @@ public class AdminController {
 
         Bennu bennu = Bennu.getInstance();
 
-        List<Invite> invites =
-                bennu.getInviteSet().stream().sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
-        model.addAttribute("invites", invites);
-
         Set<Reason> reasons = bennu.getReasonSet();
         model.addAttribute("reasons", reasons);
         model.addAttribute("expirationDays", ExternalInviteConfiguration.getConfiguration().getExpirationDays());

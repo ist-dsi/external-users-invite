@@ -30,9 +30,7 @@
     <spring:message code='label.gender' var='gender'/>
     <spring:message code='label.unit' var='unit'/>
 
-      <div class="alert alert-info" role="alert">
-        <spring:message code='label.complete.info'/>
-      </div>
+      <p><spring:message code='label.complete.info'/></p>
 
        <c:if test="${!empty error}">
       <div class="alert alert-danger" role="alert">
@@ -49,13 +47,13 @@
     </c:if>
 
     <c:if test="${! empty inviteBean}">
-      <div class="well">
-        <p><b>${inviter}:</b> ${inviteBean.getCreatorFullName()}</p>
-        <p><b>${unit}:</b> ${inviteBean.unit.name} (${inviteBean.unit.acronym})</p>
-        <p><b>${reason}:</b> ${inviteBean.reasonName} - ${inviteBean.reasonDescription}</p>
-        <p><b>${startDate}:</b> ${inviteBean.getStartDateFormatted()}</p>
-        <p><b>${endDate}:</b> ${inviteBean.getEndDateFormatted()}</p>
-      </div>
+        <dl class="dl-horizontal">
+          <dt>${inviter}</dt> <dd>${inviteBean.getCreatorFullName()}</dd>
+          <dt>${unit}</dt> <dd>${inviteBean.unit.name} (${inviteBean.unit.acronym})</dd>
+          <dt>${reason}</dt> <dd>${inviteBean.reasonName} - ${inviteBean.reasonDescription}</dd>
+          <dt>${startDate}</dt> <dd>${inviteBean.getStartDateFormatted()}</dd>
+          <dt>${endDate}</dt> <dd>${inviteBean.getEndDateFormatted()}</dd>
+        </dl>
 
       <form method="POST" action="${pageContext.request.contextPath}/public-external-invite/submitCompletion" class="form-horizontal">
 
@@ -125,7 +123,7 @@
           <div class="col-sm-10">
             <input type="text" class="form-control" id="contact" name="contact" placeholder="${contact}" required="required" value="${inviteBean.contact}"/>
           </div>
-        </div>
+        </div> 
 
         <div class="form-group">
           <label for="contactSOS" class="col-sm-2 control-label">${contactSOS}</label>
