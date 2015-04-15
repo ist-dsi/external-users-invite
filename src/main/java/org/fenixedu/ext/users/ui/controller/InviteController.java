@@ -5,10 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.ext.users.ExternalInviteConfiguration;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
 import org.fenixedu.ext.users.ui.exception.UnauthorisedUserException;
@@ -34,33 +37,39 @@ public class InviteController {
     @RequestMapping
     public String listInvites(Model model, RedirectAttributes redirectAttr) {
 
-        List<Invite> invites = service.getUserInvites();
+        User user = Authenticate.getUser();
 
-        List<Invite> completedInvites = service.filterCompletedInvites(invites);
-        List<Invite> notCompletedInvites = service.filterNotCompletedInvites(invites);
-        List<Invite> confirmedInvites = service.filterConfirmedInvites(invites);
-        List<Invite> rejectedInvites = service.filterRejectedInvites(invites);
+        List<Invite> invites = service.getUserInvites(user);
 
-        model.addAttribute("emptyInvites", invites.isEmpty());
-        model.addAttribute("completedInvites", completedInvites);
-        model.addAttribute("notCompletedInvites", notCompletedInvites);
-        model.addAttribute("confirmedInvites", confirmedInvites);
-        model.addAttribute("rejectedInvites", rejectedInvites);
+        List<Invite> unfinishedInvites = service.filterUnfinishedInvites(invites);
+        List<Invite> finishedInvites = service.filterFinishedInvites(invites);
+        model.addAttribute("unfinishedInvites", unfinishedInvites);
+        model.addAttribute("finishedInvites", finishedInvites);
 
         model.addAllAttributes(redirectAttr.getFlashAttributes());
-        model.addAttribute("action", "/external-users-invite");
+
+        boolean isManager = DynamicGroup.get("managers").isMember(user);
+        model.addAttribute("isManager", isManager);
+        if (isManager) {
+            model.addAttribute("action", "/admin-external-invite");
+        } else {
+            model.addAttribute("action", "/external-users-invite");
+        }
+
+        model.addAttribute("reasons", service.getReasons());
+        model.addAttribute("units", service.getUnits());
+
+        model.addAttribute("expirationDays", ExternalInviteConfiguration.getConfiguration().getExpirationDays());
 
         return "external-users-invite/list";
     }
 
-    @RequestMapping(value = "/newInvite", method = RequestMethod.GET)
-    public String startInvite(Model model) {
+    @RequestMapping(value = "/inviteDetails/{oid}", method = RequestMethod.GET)
+    public String inviteDetails(@PathVariable("oid") Invite invite, Model model) {
 
-        model.addAttribute("reasons", service.getReasons());
-        model.addAttribute("units", service.getUnits());
-        model.addAttribute("inviteBean", new InviteBean());
+        model.addAttribute("invite", invite);
 
-        return "external-users-invite/create";
+        return "external-users-invite/details";
     }
 
     @RequestMapping(value = "/sendInvite", method = RequestMethod.POST)
@@ -94,7 +103,7 @@ public class InviteController {
 
         if (!errors.isEmpty()) {
             redirectAttrs.addFlashAttribute("errors", errors);
-            return "redirect:/external-users-invite/newInvite";
+            return "redirect:/external-users-invite";
         }
 
         Invite invite = new InviteBean.Builder(inviteBean).build();

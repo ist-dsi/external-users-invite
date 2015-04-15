@@ -273,10 +273,10 @@ public class InviteBean {
         @Atomic(mode = TxMode.WRITE)
         public Invite build() {
 
-            DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+            DateTimeFormatter formatter = ISODateTimeFormat.date();
 
             DateTime startDateDT = formatter.parseDateTime(startDate);
-            DateTime endDateDT = formatter.parseDateTime(endDate);
+            DateTime endDateDT = formatter.parseDateTime(endDate).withTime(23, 59, 59, 999);
 
             Interval period = new Interval(startDateDT, endDateDT);
 

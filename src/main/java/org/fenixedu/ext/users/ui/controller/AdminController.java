@@ -2,16 +2,13 @@ package org.fenixedu.ext.users.ui.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.ext.users.ExternalInviteConfiguration;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.domain.Reason;
 import org.fenixedu.ext.users.ui.bean.ReasonBean;
@@ -40,7 +37,6 @@ public class AdminController {
 
         Set<Reason> reasons = bennu.getReasonSet();
         model.addAttribute("reasons", reasons);
-        model.addAttribute("expirationDays", ExternalInviteConfiguration.getConfiguration().getExpirationDays());
 
         return "admin/list";
     }
@@ -75,14 +71,6 @@ public class AdminController {
         return "redirect:/admin-external-invite";
     }
 
-    @RequestMapping(value = "/prepareAddReason", method = RequestMethod.GET)
-    public String prepareAddReason(Model model) {
-
-        model.addAttribute("reasonBean", new ReasonBean());
-
-        return "admin/createReason";
-    }
-
     @RequestMapping(value = "/addReason", method = RequestMethod.POST)
     public String addReason(@ModelAttribute ReasonBean reasonBean, RedirectAttributes redirectAttrs) {
 
@@ -97,10 +85,14 @@ public class AdminController {
 
         if (!errors.isEmpty()) {
             redirectAttrs.addFlashAttribute("errors", errors);
-            return "redirect:/admin-external-invite/prepareAddReason";
+            return "redirect:/admin-external-invite";
         }
 
         service.addReason(reasonBean);
+        redirectAttrs.addFlashAttribute(
+                "messages",
+                Arrays.asList(BundleUtil.getString(BUNDLE, "reason.new.success",
+                        new String[] { reasonBean.getName(), reasonBean.getDescription() })));
 
         return "redirect:/admin-external-invite";
     }

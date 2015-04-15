@@ -3,11 +3,10 @@
 
 
 <div class="page-header">
-  <h1><spring:message code='title.invites'/></h1>
+  <h2><spring:message code='title.invites'/></h2>
+  <small><spring:message code='title.configurations'/></small>
 </div>
-<div class="well">
   <p><spring:message code='external.invites.admin.well'/></p>
-</div>
 
 <c:if test="${! empty errors}">
   <div class="alert alert-danger" role="alert">
@@ -25,19 +24,7 @@
   </div>
 </c:if>
 
-
-<h4><spring:message code='title.expiration.days'/></h4>
-
-<dl class="dl-horizontal">
-  <dt><spring:message code='title.expiration.days'/></dt>
-  <dd>${expirationDays}</dd>
-</dl>
-
-<br><br>
-
 <h4><spring:message code='title.reasons'/> <span class="badge">${reasons.size()}</span></a></h4>
-
-<!-- <a href="${pageContext.request.contextPath}/admin-external-invite/prepareAddReason" type="button" class="btn btn-primary" data-toggle="modal" data-target="new-reason-modal"><spring:message code='button.create'/></a> -->
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new-reason-modal">
@@ -47,13 +34,19 @@
 <!-- Modal -->
 <div class="modal fade" id="new-reason-modal" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
   <div class="modal-dialog">
-    <form class="form-horizontal" method="POST" action="${pageContext.request.contextPath}/admin-external-invite/addReason">
+    <form class="form-horizontal" method="POST" action="${pageContext.request.contextPath}/admin-external-invite/addReason" id='new-reason-form'>
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="modal-label">Modal title</h4>
+          <h3 class="modal-title" id="modal-label"><spring:message code='title.reason.create'/></h3>
+          <small><spring:message code='external.invite.reason.create.well'/></small>
         </div>
         <div class="modal-body">
+
+          <div id='modal-errors' class="alert alert-danger alert-dismissible fade in" role="alert" hidden>
+            <button type="button" class="close" onclick="hideModalErrors()"><span aria-hidden="true">&times</span></button>
+            <p><spring:message code='error.modal.fill.fields'/></p>
+          </div>
 
           <div class="form-group">
             <label for="name" class="col-sm-2 control-label"><spring:message code='label.name'/></label>
@@ -69,12 +62,6 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-default"><spring:message code='label.create'/></button>
-            </div>
-          </div>
-
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code='button.cancel'/></button>
@@ -85,7 +72,30 @@
   </div>
 </div>
 
+<script type="text/javascript">
+  function hideModalErrors() {
+      $('#modal-errors').hide();
+  }
 
+  $(function() {
+    $('#new-reason-form').submit(function() {
+        var hasError = false;
+
+        $(this).find('input').each(function(index, input) {
+          if(! $(input).val()) {
+            hasError = true;
+            $('#modal-errors').show();
+            $(input).closest('.form-group').addClass('has-error');
+          }
+          else {
+            $(input).closest('.form-group').removeClass('has-error');
+          } 
+        });
+
+        return ! hasError;
+    });
+});
+</script>
 
 <c:if test="${empty reasons}">
   <div class="panel panel-default">
@@ -101,12 +111,14 @@
       <col></col>
       <col></col>
       <col></col>
+      <col></col>
     </colgroup>
     <thead>
       <tr>
         <th><spring:message code='label.name'/></th>
         <th><spring:message code='label.description'/></th>
         <th><spring:message code='label.active'/></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -115,14 +127,14 @@
           <td>${reason.name}</td>
           <td>${reason.description}</td>
           <td><spring:message code='${reason.active ? "label.yes" : "label.no"}'/></td>
-          <td>
+          <td class="pull-right">
             <c:if test="${reason.active}">
               <a href="${pageContext.request.contextPath}/admin-external-invite/disableReason/${reason.externalId}" class="btn btn-default"><spring:message code='label.deactivate'/></a>
             </c:if>
             <c:if test="${! reason.active}">
               <a href="${pageContext.request.contextPath}/admin-external-invite/enableReason/${reason.externalId}" class="btn btn-default"><spring:message code='label.activate'/></a>
             </c:if>
-            <a href="${pageContext.request.contextPath}/admin-external-invite/deleteReason/${reason.externalId}" class="btn btn-default pull-right">&times</a>
+            <a href="${pageContext.request.contextPath}/admin-external-invite/deleteReason/${reason.externalId}" class="btn btn-default">&times</a>
           </td>
         </tr>
       </c:forEach>

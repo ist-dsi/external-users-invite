@@ -19,14 +19,8 @@ public class Invite extends Invite_Base {
 
     static String BUNDLE = "resources.ExternalUsersInviteResources";
 
-    public final static Comparator<Invite> COMPARATOR_BY_CREATION_TIME = new Comparator<Invite>() {
-
-        @Override
-        public int compare(Invite arg0, Invite arg1) {
-
-            return arg1.getCreationTime().compareTo(arg0.getCreationTime());
-        }
-    };
+    public final static Comparator<Invite> COMPARATOR_BY_CREATION_TIME = (arg0, arg1) -> arg1.getCreationTime().compareTo(
+            arg0.getCreationTime());
 
     public Invite(User creator, String givenName, String familyNames, Gender gender, String email, Interval period,
             Reason reason, String otherReason, Unit unit, String idDocumentNumber, IDDocumentType idDocumentType,
@@ -42,6 +36,8 @@ public class Invite extends Invite_Base {
         setReason(reason);
         setOtherReason(otherReason);
         setUnit(unit);
+        setIdDocumentNumber(idDocumentNumber);
+        setIdDocumentType(idDocumentType);
         setInvitedInstitutionAddress(invitedInstitutionAddress);
         setInvitedInstitutionName(invitedInstitutionName);
         setContact(contact);
@@ -56,10 +52,10 @@ public class Invite extends Invite_Base {
     }
 
     public String getReasonName() {
-        return this.getReason() != null ? this.getReason().getName() : BundleUtil.getString(BUNDLE, "reason.other.name");
+        return getReason() != null ? getReason().getName() : BundleUtil.getString(BUNDLE, "reason.other.name");
     }
 
     public String getReasonDescription() {
-        return this.getReason() != null ? this.getReason().getDescription() : this.getOtherReason();
+        return getReason() != null ? getReason().getDescription() : getOtherReason();
     }
 }

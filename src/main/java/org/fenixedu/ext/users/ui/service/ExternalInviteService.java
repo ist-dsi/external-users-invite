@@ -13,6 +13,7 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserLoginPeriod;
 import org.fenixedu.bennu.core.domain.UserProfile;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.I18N;
@@ -35,6 +36,9 @@ import org.springframework.stereotype.Service;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 @Service
 public class ExternalInviteService {
 
@@ -50,9 +54,34 @@ public class ExternalInviteService {
                 .collect(Collectors.toList());
     }
 
-    public List<Invite> getUserInvites() {
-        return Bennu.getInstance().getInviteSet().stream()
-                .filter(i -> i.getCreator() != null && i.getCreator().equals(Authenticate.getUser()))
+    public List<Invite> getUserInvites(User user) {
+
+        boolean isManager = DynamicGroup.get("managers").isMember(user);
+
+        if (isManager) {
+            return Bennu.getInstance().getInviteSet().stream().sorted(Invite.COMPARATOR_BY_CREATION_TIME)
+                    .collect(Collectors.toList());
+        } else {
+            return Bennu.getInstance().getInviteSet().stream()
+                    .filter(i -> i.getCreator() != null && i.getCreator().equals(Authenticate.getUser()))
+                    .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+        }
+    }
+
+    public List<Invite> filterUnfinishedInvites(List<Invite> invites) {
+        return Stream
+                .concat(filterInvitesByState(invites, InviteState.COMPLETED).stream(),
+                        filterInvitesByState(invites, InviteState.NOT_COMPLETED).stream()).distinct()
+                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+    }
+
+    public List<Invite> filterFinishedInvites(List<Invite> invites) {
+        return Lists
+                .newArrayList(
+                        Iterables.concat(filterInvitesByState(invites, InviteState.CONFIRMED_BY_CREATOR),
+                                filterInvitesByState(invites, InviteState.CONFIRMED_BY_MANAGER),
+                                filterInvitesByState(invites, InviteState.REJECTED_BY_CREATOR),
+                                filterInvitesByState(invites, InviteState.REJECTED_BY_MANAGER))).stream().distinct()
                 .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
     }
 
@@ -60,14 +89,14 @@ public class ExternalInviteService {
         return Stream
                 .concat(filterInvitesByState(invites, InviteState.CONFIRMED_BY_CREATOR).stream(),
                         filterInvitesByState(invites, InviteState.CONFIRMED_BY_MANAGER).stream()).distinct()
-                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+                        .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
     }
 
     public List<Invite> filterRejectedInvites(List<Invite> invites) {
         return Stream
                 .concat(filterInvitesByState(invites, InviteState.REJECTED_BY_CREATOR).stream(),
                         filterInvitesByState(invites, InviteState.REJECTED_BY_MANAGER).stream()).distinct()
-                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+                        .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
     }
 
     public List<Invite> filterCompletedInvites(List<Invite> invites) {
@@ -151,10 +180,10 @@ public class ExternalInviteService {
 
         String body =
                 messageSource
-                        .getMessage("external.user.confirmation.message.body", new Object[] {
-                                invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(),
-                                link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm"), person.getUsername() }, I18N.getLocale());
+                .getMessage("external.user.confirmation.message.body", new Object[] {
+                        invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(),
+                        link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
+                        invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm"), person.getUsername() }, I18N.getLocale());
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -227,7 +256,7 @@ public class ExternalInviteService {
 
         Set<Unit> researchUnitsRoot =
                 Bennu.getInstance().getInstitutionUnit().getSubUnits().stream()
-                        .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
+                .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
 
         if (researchUnitsRoot.size() == 1) {
             return researchUnitsRoot.iterator().next().getAllSubUnits().stream()
