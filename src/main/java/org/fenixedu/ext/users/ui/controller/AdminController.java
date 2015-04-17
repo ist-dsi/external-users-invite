@@ -50,10 +50,10 @@ public class AdminController {
 
         redirectAttrs.addFlashAttribute(
                 "messages",
-                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.confirm", new String[] {
-                        invite.getGivenName(), invite.getEmail(), person.getUsername() })));
+                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.confirm", new String[] { invite.getFullName(),
+                        invite.getEmail(), person.getUsername() })));
 
-        return "redirect:/admin-external-invite";
+        return "redirect:/external-users-invite";
     }
 
     @RequestMapping(value = "/rejectInvite/{oid}", method = RequestMethod.GET)
@@ -65,10 +65,10 @@ public class AdminController {
 
         redirectAttrs.addFlashAttribute(
                 "messages",
-                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.reject", new String[] { invite.getGivenName(),
+                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.reject", new String[] { invite.getFullName(),
                         invite.getEmail() })));
 
-        return "redirect:/admin-external-invite";
+        return "redirect:/external-users-invite";
     }
 
     @RequestMapping(value = "/addReason", method = RequestMethod.POST)

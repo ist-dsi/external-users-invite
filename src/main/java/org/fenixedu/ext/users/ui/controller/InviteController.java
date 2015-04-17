@@ -113,7 +113,7 @@ public class InviteController {
         redirectAttrs.addFlashAttribute(
                 "messages",
                 Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.send.successfully",
-                        new String[] { invite.getGivenName(), invite.getEmail() })));
+                        new String[] { invite.getFullName(), invite.getEmail() })));
 
         return "redirect:/external-users-invite";
     }
@@ -131,7 +131,7 @@ public class InviteController {
             redirectAttrs.addFlashAttribute(
                     "messages",
                     Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.confirm",
-                            new String[] { invite.getGivenName(), invite.getEmail(), person.getUsername() })));
+                            new String[] { invite.getFullName(), invite.getEmail(), person.getUsername() })));
 
             return "redirect:/external-users-invite";
         } catch (UnauthorisedUserException e) {
@@ -153,7 +153,7 @@ public class InviteController {
             redirectAttrs.addFlashAttribute(
                     "messages",
                     Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.reject",
-                            new String[] { invite.getGivenName(), invite.getEmail() })));
+                            new String[] { invite.getFullName(), invite.getEmail() })));
 
             return "redirect:/external-users-invite";
         } catch (UnauthorisedUserException e) {

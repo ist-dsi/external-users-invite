@@ -58,4 +58,12 @@ public class Invite extends Invite_Base {
     public String getReasonDescription() {
         return getReason() != null ? getReason().getDescription() : getOtherReason();
     }
+
+    public String getFullName() {
+        return String.join(" ", getGivenName(), getFamilyNames());
+    }
+
+    public String getPeriodFormatted() {
+        return getPeriod().getStart().toString("dd/MM/YYY") + " - " + getPeriod().getEnd().toString("dd/MM/YYY");
+    }
 }

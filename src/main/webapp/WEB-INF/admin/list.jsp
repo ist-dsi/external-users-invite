@@ -6,7 +6,7 @@
   <h2><spring:message code='title.invites'/></h2>
   <small><spring:message code='title.configurations'/></small>
 </div>
-  <p><spring:message code='external.invites.admin.well'/></p>
+<p><spring:message code='external.invites.admin.well'/></p>
 
 <c:if test="${! empty errors}">
   <div class="alert alert-danger" role="alert">
@@ -28,7 +28,7 @@
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new-reason-modal">
-  <spring:message code='button.create'/>
+  <i class="icon icon-plus"></i><spring:message code='button.new'/>
 </button>
 
 <!-- Modal -->
@@ -117,8 +117,7 @@
       <tr>
         <th><spring:message code='label.name'/></th>
         <th><spring:message code='label.description'/></th>
-        <th><spring:message code='label.active'/></th>
-        <th></th>
+        <th colspan="2"><spring:message code='label.active'/></th>
       </tr>
     </thead>
     <tbody>

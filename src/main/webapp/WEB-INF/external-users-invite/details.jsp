@@ -5,6 +5,7 @@
   <h1><spring:message code='title.invite.details'/></h1>
   <small><spring:message code='title.invites'/></small>
 </div>
+<p><spring:message code='external.invites.details.well'/></p>
 
 <dl class="dl-horizontal">
   <dt><spring:message code='label.inviter'/></dt><dd>${invite.creator.profile.fullName}</dd>
