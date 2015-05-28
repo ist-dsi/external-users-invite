@@ -31,7 +31,7 @@ public class AdminController {
     ExternalInviteService service;
 
     @RequestMapping
-    public String listInvites(Model model) {
+    public String listReasons(Model model) {
 
         Bennu bennu = Bennu.getInstance();
 
@@ -46,7 +46,7 @@ public class AdminController {
 
         //TODO: check state
 
-        Person person = service.confirmInvite(invite, true);
+        Person person = service.confirmInvite(invite);
 
         redirectAttrs.addFlashAttribute(
                 "messages",
@@ -61,7 +61,7 @@ public class AdminController {
 
         //TODO: check state
 
-        service.rejectInvite(invite, true);
+        service.rejectInvite(invite);
 
         redirectAttrs.addFlashAttribute(
                 "messages",

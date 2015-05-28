@@ -72,31 +72,25 @@ public class ExternalInviteService {
         return Stream
                 .concat(filterInvitesByState(invites, InviteState.COMPLETED).stream(),
                         filterInvitesByState(invites, InviteState.NOT_COMPLETED).stream()).distinct()
-                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+                        .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
     }
 
     public List<Invite> filterFinishedInvites(List<Invite> invites) {
         return Lists
                 .newArrayList(
-                        Iterables.concat(filterInvitesByState(invites, InviteState.CONFIRMED_BY_CREATOR),
-                                filterInvitesByState(invites, InviteState.CONFIRMED_BY_MANAGER),
-                                filterInvitesByState(invites, InviteState.REJECTED_BY_CREATOR),
-                                filterInvitesByState(invites, InviteState.REJECTED_BY_MANAGER))).stream().distinct()
-                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+                        Iterables.concat(filterInvitesByState(invites, InviteState.CONFIRMED),
+                                filterInvitesByState(invites, InviteState.REJECTED))).stream().distinct()
+                                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
     }
 
     public List<Invite> filterConfirmedInvites(List<Invite> invites) {
-        return Stream
-                .concat(filterInvitesByState(invites, InviteState.CONFIRMED_BY_CREATOR).stream(),
-                        filterInvitesByState(invites, InviteState.CONFIRMED_BY_MANAGER).stream()).distinct()
-                        .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+        return filterInvitesByState(invites, InviteState.CONFIRMED).stream().distinct()
+                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
     }
 
     public List<Invite> filterRejectedInvites(List<Invite> invites) {
-        return Stream
-                .concat(filterInvitesByState(invites, InviteState.REJECTED_BY_CREATOR).stream(),
-                        filterInvitesByState(invites, InviteState.REJECTED_BY_MANAGER).stream()).distinct()
-                        .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+        return filterInvitesByState(invites, InviteState.REJECTED).stream().distinct().sorted(Invite.COMPARATOR_BY_CREATION_TIME)
+                .collect(Collectors.toList());
     }
 
     public List<Invite> filterCompletedInvites(List<Invite> invites) {
@@ -152,9 +146,9 @@ public class ExternalInviteService {
     }
 
     @Atomic(mode = TxMode.WRITE)
-    public Person confirmInvite(Invite invite, boolean admin) {
+    public Person confirmInvite(Invite invite) {
 
-        invite.setState(admin ? InviteState.CONFIRMED_BY_MANAGER : InviteState.CONFIRMED_BY_CREATOR);
+        invite.setState(InviteState.CONFIRMED);
 
         UserProfile userProfile = new UserProfile(invite.getGivenName(), invite.getFamilyNames(), null, invite.getEmail(), null);
         User user = new User(userProfile);
@@ -180,10 +174,10 @@ public class ExternalInviteService {
 
         String body =
                 messageSource
-                .getMessage("external.user.confirmation.message.body", new Object[] {
-                        invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(),
-                        link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                        invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm"), person.getUsername() }, I18N.getLocale());
+                        .getMessage("external.user.confirmation.message.body", new Object[] {
+                                invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(),
+                                link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
+                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm"), person.getUsername() }, I18N.getLocale());
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -193,9 +187,9 @@ public class ExternalInviteService {
     }
 
     @Atomic(mode = TxMode.WRITE)
-    public void rejectInvite(Invite invite, boolean admin) {
+    public void rejectInvite(Invite invite) {
 
-        invite.setState(admin ? InviteState.REJECTED_BY_MANAGER : InviteState.REJECTED_BY_CREATOR);
+        invite.setState(InviteState.REJECTED);
         sendRejectionMessage(invite);
     }
 
@@ -256,7 +250,7 @@ public class ExternalInviteService {
 
         Set<Unit> researchUnitsRoot =
                 Bennu.getInstance().getInstitutionUnit().getSubUnits().stream()
-                .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
+                        .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
 
         if (researchUnitsRoot.size() == 1) {
             return researchUnitsRoot.iterator().next().getAllSubUnits().stream()

@@ -41,8 +41,8 @@ public class InviteController {
 
         List<Invite> invites = service.getUserInvites(user);
 
-        List<Invite> unfinishedInvites = service.filterUnfinishedInvites(invites);
-        List<Invite> finishedInvites = service.filterFinishedInvites(invites);
+        List<Invite> unfinishedInvites = service.filterNotCompletedInvites(invites);
+        List<Invite> finishedInvites = service.filterCompletedInvites(invites);;
         model.addAttribute("unfinishedInvites", unfinishedInvites);
         model.addAttribute("finishedInvites", finishedInvites);
 
@@ -64,11 +64,17 @@ public class InviteController {
         return "external-users-invite/list";
     }
 
+    @RequestMapping(value = "/historic", method = RequestMethod.GET)
+    public String listHistoric(Model model) {
+        User user = Authenticate.getUser();
+        List<Invite> invites = service.getUserInvites(user);
+        model.addAttribute("invites", service.filterFinishedInvites(invites));
+        return "external-users-invite/history";
+    }
+
     @RequestMapping(value = "/inviteDetails/{oid}", method = RequestMethod.GET)
     public String inviteDetails(@PathVariable("oid") Invite invite, Model model) {
-
         model.addAttribute("invite", invite);
-
         return "external-users-invite/details";
     }
 
@@ -126,7 +132,7 @@ public class InviteController {
 
             //TODO: check state
 
-            Person person = service.confirmInvite(invite, false);
+            Person person = service.confirmInvite(invite);
 
             redirectAttrs.addFlashAttribute(
                     "messages",
@@ -148,7 +154,7 @@ public class InviteController {
 
             //TODO: check state
 
-            service.rejectInvite(invite, false);
+            service.rejectInvite(invite);
 
             redirectAttrs.addFlashAttribute(
                     "messages",

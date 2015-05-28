@@ -110,7 +110,7 @@ public class InviteBean {
 
     public String getStartDateFormatted() {
         DateTime dateTime = getStartDateTime();
-        return dateTime != null ? dateTime.toString("dd-MM-YYY HH:mm") : null;
+        return dateTime != null ? dateTime.toString("dd/MM/YYY") : null;
     }
 
     public void setStartDate(String startDate) {
@@ -131,7 +131,7 @@ public class InviteBean {
 
     public String getEndDateFormatted() {
         DateTime dateTime = getEndDateTime();
-        return dateTime != null ? dateTime.toString("dd-MM-YYY HH:mm") : null;
+        return dateTime != null ? dateTime.toString("dd/MM/YYY") : null;
     }
 
     public User getCreator() {
@@ -200,6 +200,10 @@ public class InviteBean {
 
     public void setUnit(Unit unit) {
         this.unit = unit;
+    }
+
+    public String getFullName() {
+        return String.join(" ", getGivenName(), getFamilyNames());
     }
 
     public InviteBean() {

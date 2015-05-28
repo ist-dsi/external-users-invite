@@ -17,12 +17,13 @@
     <spring:message code='label.reason' var='reason'/>
     <spring:message code='label.date.start' var='startDate'/>
     <spring:message code='label.date.end' var='endDate'/>
+    <spring:message code='label.invite.expiration' var='invitePeriod'/>
 
     <spring:message code='label.given.name' var='givenName'/>
     <spring:message code='label.family.names' var='familyNames'/>
     <spring:message code='label.email' var='email'/>
-    <spring:message code='label.invited.institution.name' var='invitedInstitutionName'/>
-    <spring:message code='label.invited.institution.address' var='invitedInstitutionAddress'/>
+    <spring:message code='label.invited.institution.name.public' var='invitedInstitutionName'/>
+    <spring:message code='label.invited.institution.address.public' var='invitedInstitutionAddress'/>
     <spring:message code='label.contact' var='contact'/>
     <spring:message code='label.contact.sos' var='contactSOS'/>
     <spring:message code='label.id.document.type' var='idDocumentType'/>
@@ -51,8 +52,7 @@
           <dt>${inviter}</dt> <dd>${inviteBean.getCreatorFullName()}</dd>
           <dt>${unit}</dt> <dd>${inviteBean.unit.name} (${inviteBean.unit.acronym})</dd>
           <dt>${reason}</dt> <dd>${inviteBean.reasonName} - ${inviteBean.reasonDescription}</dd>
-          <dt>${startDate}</dt> <dd>${inviteBean.getStartDateFormatted()}</dd>
-          <dt>${endDate}</dt> <dd>${inviteBean.getEndDateFormatted()}</dd>
+          <dt>${invitePeriod}</dt> <dd>${inviteBean.getStartDateFormatted()} - ${inviteBean.getEndDateFormatted()}</dd>
         </dl>
 
       <form method="POST" action="${pageContext.request.contextPath}/public-external-invite/submitCompletion" class="form-horizontal">
@@ -79,7 +79,7 @@
             <select id="gender" name="gender" required="required">
               <option value=""><spring:message code='label.option.select'/></option>
               <c:forEach var="gender" items="${genderEnum}">
-                <option value="${gender}">${gender}</option>
+                <option value="${gender}">${gender.toLocalizedString()}</option>
               </c:forEach>
             </select>
           </div>
@@ -91,7 +91,7 @@
             <select id="idDocumentType" name="idDocumentType" required="required">
               <option value=""><spring:message code='label.option.select'/></option>
               <c:forEach var="type" items="${IDDocumentTypes}">
-                <option value="${type}">${type}</option>
+                <option value="${type}">${type.localizedName}</option>
               </c:forEach>
             </select>
           </div>
@@ -101,20 +101,6 @@
           <label for="idDocumentNumber" class="col-sm-2 control-label">${idDocumentNumber}</label>
           <div class="col-sm-10">
             <input type="text" class="form-control" id="idDocumentNumber" name="idDocumentNumber" placeholder="${idDocumentNumber}" required="required" value="${inviteBean.idDocumentNumber}"/>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="invitedInstitutionName" class="col-sm-2 control-label">${invitedInstitutionName}</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" id="invitedInstitutionName" name="invitedInstitutionName" placeholder="${invitedInstitutionName}" required="required" value="${inviteBean.invitedInstitutionName}"/>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="invitedInstitutionAddress" class="col-sm-2 control-label">${invitedInstitutionAddress}</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" id="invitedInstitutionAddress" name="invitedInstitutionAddress" placeholder="${invitedInstitutionAddress}" required="required" value="${inviteBean.invitedInstitutionAddress}"/>
           </div>
         </div>
 
@@ -129,6 +115,20 @@
           <label for="contactSOS" class="col-sm-2 control-label">${contactSOS}</label>
           <div class="col-sm-10">
             <input type="text" class="form-control" id="contactSOS" name="contactSOS" placeholder="${contactSOS}" required="required" value="${inviteBean.contactSOS}"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="invitedInstitutionName" class="col-sm-2 control-label">${invitedInstitutionName}</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="invitedInstitutionName" name="invitedInstitutionName" placeholder="${invitedInstitutionName}" required="required" value="${inviteBean.invitedInstitutionName}"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="invitedInstitutionAddress" class="col-sm-2 control-label">${invitedInstitutionAddress}</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="invitedInstitutionAddress" name="invitedInstitutionAddress" placeholder="${invitedInstitutionAddress}" required="required" value="${inviteBean.invitedInstitutionAddress}"/>
           </div>
         </div>
 

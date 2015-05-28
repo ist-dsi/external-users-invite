@@ -3,22 +3,26 @@ package org.fenixedu.ext.users.domain;
 import java.util.Locale;
 
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.commons.i18n.I18N;
 
 public enum InviteState {
 
-    NOT_COMPLETED, //after creator submits first step
+    NOT_COMPLETED(null), // after creator submits first step
 
-    COMPLETED, //after invited person completes data
+    COMPLETED(null), // after invited person completes data
 
-    CONFIRMED_BY_CREATOR, //invite creator confirms data
+    CONFIRMED(Authenticate.getUser()), // data confirmed and accepted
 
-    REJECTED_BY_CREATOR, //invite creator rejects data
+    REJECTED(Authenticate.getUser()); // rejected invite
 
-    CONFIRMED_BY_MANAGER, //system manager accepts invite
+    private User user;
 
-    REJECTED_BY_MANAGER; //system manager rejects invite
+    private InviteState(User user) {
+        setUser(user);
+    }
 
     public String getQualifiedName() {
         return InviteState.class.getSimpleName() + "." + name();
@@ -31,4 +35,13 @@ public enum InviteState {
     public String getLocalizedName(Locale locale) {
         return BundleUtil.getString(Bundle.ENUMERATION, locale, getQualifiedName());
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
 }

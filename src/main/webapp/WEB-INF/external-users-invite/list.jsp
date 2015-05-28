@@ -32,11 +32,12 @@ ${portal.toolkit()}
       <c:if test="${isManager}">
         <a href="${pageContext.request.contextPath}/external-users-invite/admin-external-invite" type="button" class='btn btn-default'><spring:message code='button.reasons.manage'/></a>
       </c:if>
+      <a href="${pageContext.request.contextPath}/external-users-invite/historic" type="button" class='btn btn-default'><spring:message code='button.invites.historic'/></a>
     </div>
   </div>
 </p>
 
-<!-- Modal --> <!-- TODO: required -->
+<!-- Modal -->
 <div class="modal fade" id="new-invite-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form class="form-horizontal" method="POST" action="${pageContext.request.contextPath}/external-users-invite/sendInvite" id='new-invite-form'>
@@ -153,8 +154,7 @@ ${portal.toolkit()}
   $(function() {
     $('#new-invite-form').submit(function() {
         var hasError = false;
-        debugger;
-        //TODO: fix invalid date comparison
+        //TODO: fix invalid date comparison. Issue: https://jira.fenixedu.org/browse/BNN-227
         $(this).find('.required').each(function(index, input) {
           if( (! $(input).val()) || (($(input).attr("bennu-date") !== undefined) && ($(input).val() == "Invalid date"))) {
             hasError = true;
@@ -198,7 +198,51 @@ ${portal.toolkit()}
   }
 </script>
 
-<h4><spring:message code='title.invites.unfinished'/> <span class="badge">${unfinishedInvites.size()}</span></a></h4>
+<c:if test="${! empty finishedInvites}">
+<h4><spring:message code='title.invites.completed'/> <span class="badge">${finishedInvites.size()}</span></a></h4>
+  <table class="table">
+    <colgroup>
+     <col></col>
+     <col></col>
+     <col></col>
+     <col></col>
+     <col></col>
+    </colgroup>
+      <thead>
+        <tr>
+          <th><spring:message code='label.inviter'/></th>
+          <th><spring:message code='label.creation.time'/></th>
+          <th><spring:message code='label.invited'/></th>
+          <th><spring:message code='label.reason'/></th>
+          <th><spring:message code='label.period'/></th>
+          <th colspan="2"><spring:message code='label.state'/></th>
+        </tr>
+      </thead>
+    <tbody>
+      <c:forEach items="${finishedInvites}" var="invite">
+        <tr>
+          <td>${invite.creator.profile.fullName}</td>
+          <td>${invite.creationTime.toString('dd/MM/YYY HH:mm')}</td>
+          <td>${invite.fullName} (${invite.email})</td>
+          <td>${invite.reasonName}</td>
+          <td>${invite.periodFormatted}</td>
+          <td>${invite.state.localizedName}</td>
+          <td>
+            <div class="btn-group btn-group-xs">
+              <a href="${pageContext.request.contextPath}${action}/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'><spring:message code='button.accept'/></a>
+              <a href="${pageContext.request.contextPath}${action}/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'><spring:message code='button.reject'/></a>
+              <a href="${pageContext.request.contextPath}/external-users-invite/inviteDetails/${invite.externalId}" type="button" class="btn btn-default details-button">
+                  <spring:message code='button.details'/>
+              </a>
+            </div>
+          </td>
+        </tr>
+      </c:forEach>
+    </tbody>
+  </table>
+</c:if>
+
+<h4><spring:message code='title.invites.incomplete'/> <span class="badge">${unfinishedInvites.size()}</span></a></h4>
 <c:if test="${empty unfinishedInvites}">
   <div class="panel panel-default">
     <div class="panel-body">
@@ -229,7 +273,7 @@ ${portal.toolkit()}
       </thead>
     <tbody>
       <c:forEach items="${unfinishedInvites}" var="invite">
-        <tr> <!--TODO: choose table cols-->
+        <tr>
           <td>${invite.creator.profile.fullName}</td>
           <td>${invite.creationTime.toString('dd/MM/YYY HH:mm')}</td>
           <td>${invite.fullName} (${invite.email})</td>
@@ -240,48 +284,6 @@ ${portal.toolkit()}
             <div class="btn-group btn-group-xs">
               <a href="${pageContext.request.contextPath}${action}/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'><spring:message code='button.accept'/></a>
               <a href="${pageContext.request.contextPath}${action}/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'><spring:message code='button.reject'/></a>
-              <a href="${pageContext.request.contextPath}/external-users-invite/inviteDetails/${invite.externalId}" type="button" class="btn btn-default details-button">
-                  <spring:message code='button.details'/>
-              </a>
-            </div>
-          </td>
-        </tr>
-      </c:forEach>
-    </tbody>
-  </table>
-</c:if>
-
-<c:if test="${! empty finishedInvites}">
-<h4><spring:message code='title.invites.finished'/> <span class="badge">${finishedInvites.size()}</span></a></h4>
-  <table class="table">
-    <colgroup>
-     <col></col>
-     <col></col>
-     <col></col>
-     <col></col>
-     <col></col>
-    </colgroup>
-      <thead>
-        <tr>
-          <th><spring:message code='label.inviter'/></th>
-          <th><spring:message code='label.creation.time'/></th>
-          <th><spring:message code='label.invited'/></th>
-          <th><spring:message code='label.reason'/></th>
-          <th><spring:message code='label.period'/></th>
-          <th colspan="2"><spring:message code='label.state'/></th>
-        </tr>
-      </thead>
-    <tbody>
-      <c:forEach items="${finishedInvites}" var="invite">
-        <tr>
-          <td>${invite.creator.profile.fullName}</td>
-          <td>${invite.creationTime.toString('dd/MM/YYY HH:mm')}</td>
-          <td>${invite.fullName} (${invite.email})</td>
-          <td>${invite.reasonName}</td>
-          <td>${invite.periodFormatted}</td>
-          <td>${invite.state.localizedName}</td>
-          <td>
-            <div class="btn-group btn-group-xs">
               <a href="${pageContext.request.contextPath}/external-users-invite/inviteDetails/${invite.externalId}" type="button" class="btn btn-default details-button">
                   <spring:message code='button.details'/>
               </a>
