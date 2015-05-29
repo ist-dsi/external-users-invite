@@ -12,6 +12,7 @@ import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.domain.Reason;
 import org.fenixedu.ext.users.ui.bean.ReasonBean;
+import org.fenixedu.ext.users.ui.exception.ChangeInviteFinalStateException;
 import org.fenixedu.ext.users.ui.service.ExternalInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -44,31 +45,37 @@ public class AdminController {
     @RequestMapping(value = "/confirmInvite/{oid}", method = RequestMethod.GET)
     public String confirmInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
-        //TODO: check state
+        try {
+            Person person = service.confirmInvite(invite);
 
-        Person person = service.confirmInvite(invite);
+            redirectAttrs.addFlashAttribute(
+                    "messages",
+                    Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.confirm",
+                            new String[] { invite.getFullName(), invite.getEmail(), person.getUsername() })));
 
-        redirectAttrs.addFlashAttribute(
-                "messages",
-                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.confirm", new String[] { invite.getFullName(),
-                        invite.getEmail(), person.getUsername() })));
-
-        return "redirect:/external-users-invite";
+            return "redirect:/external-users-invite";
+        } catch (ChangeInviteFinalStateException e) {
+            redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getClass().getSimpleName()));
+            return "redirect:/external-users-invite";
+        }
     }
 
     @RequestMapping(value = "/rejectInvite/{oid}", method = RequestMethod.GET)
     public String rejectInvite(@PathVariable("oid") Invite invite, RedirectAttributes redirectAttrs) {
 
-        //TODO: check state
+        try {
+            service.rejectInvite(invite);
+            redirectAttrs.addFlashAttribute(
+                    "messages",
+                    Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.reject",
+                            new String[] { invite.getFullName(), invite.getEmail() })));
 
-        service.rejectInvite(invite);
+            return "redirect:/external-users-invite";
+        } catch (ChangeInviteFinalStateException e) {
+            redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getClass().getSimpleName()));
+            return "redirect:/external-users-invite";
+        }
 
-        redirectAttrs.addFlashAttribute(
-                "messages",
-                Arrays.asList(BundleUtil.getString(BUNDLE, "message.invite.creator.reject", new String[] { invite.getFullName(),
-                        invite.getEmail() })));
-
-        return "redirect:/external-users-invite";
     }
 
     @RequestMapping(value = "/addReason", method = RequestMethod.POST)

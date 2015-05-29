@@ -26,6 +26,10 @@
 <br>
 <p><spring:message code='external.invites.details.well'/></p>
 <br>
+ <div class="btn-group btn-group-xs">
+              <a href="${pageContext.request.contextPath}/external-users-invite/confirmInvite/${invite.externalId}" class="btn btn-default" id='accept-btn'><spring:message code='button.accept'/></a>
+              <a href="${pageContext.request.contextPath}/external-users-invite/rejectInvite/${invite.externalId}" class="btn btn-default" id='reject-btn'><spring:message code='button.reject'/></a>
+</div>
 <h4><spring:message code='label.details.invite'/></h4>
 <dl class="dl-horizontal">
   <dt><spring:message code='label.inviter'/></dt><dd>${invite.creator.profile.fullName}</dd>

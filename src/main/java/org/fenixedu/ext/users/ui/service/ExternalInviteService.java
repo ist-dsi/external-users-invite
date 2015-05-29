@@ -23,6 +23,7 @@ import org.fenixedu.ext.users.domain.InviteState;
 import org.fenixedu.ext.users.domain.Reason;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
 import org.fenixedu.ext.users.ui.bean.ReasonBean;
+import org.fenixedu.ext.users.ui.exception.ChangeInviteFinalStateException;
 import org.fenixedu.ext.users.ui.exception.ExpiredInviteException;
 import org.fenixedu.ext.users.ui.exception.ExternalInviteException;
 import org.fenixedu.ext.users.ui.exception.NonUniqueInviteHashException;
@@ -72,7 +73,7 @@ public class ExternalInviteService {
         return Stream
                 .concat(filterInvitesByState(invites, InviteState.COMPLETED).stream(),
                         filterInvitesByState(invites, InviteState.NOT_COMPLETED).stream()).distinct()
-                        .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
     }
 
     public List<Invite> filterFinishedInvites(List<Invite> invites) {
@@ -80,7 +81,7 @@ public class ExternalInviteService {
                 .newArrayList(
                         Iterables.concat(filterInvitesByState(invites, InviteState.CONFIRMED),
                                 filterInvitesByState(invites, InviteState.REJECTED))).stream().distinct()
-                                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
+                .sorted(Invite.COMPARATOR_BY_CREATION_TIME).collect(Collectors.toList());
     }
 
     public List<Invite> filterConfirmedInvites(List<Invite> invites) {
@@ -115,11 +116,10 @@ public class ExternalInviteService {
                         + invite.getHash();
 
         String body =
-                messageSource.getMessage(
-                        "external.user.invite.message.body",
-                        new Object[] { invite.getCreator().getProfile().getFullName(), getInstitutionName(),
-                                invite.getReasonName(), link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale());
+                messageSource.getMessage("external.user.invite.message.body", new Object[] {
+                        invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(), link,
+                        invite.getPeriod().getStart().toString("dd-MM-YYY"), invite.getPeriod().getEnd().toString("dd-MM-YYY") },
+                        I18N.getLocale());
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -146,7 +146,11 @@ public class ExternalInviteService {
     }
 
     @Atomic(mode = TxMode.WRITE)
-    public Person confirmInvite(Invite invite) {
+    public Person confirmInvite(Invite invite) throws ChangeInviteFinalStateException {
+
+        if (inFinalState(invite)) {
+            throw new ChangeInviteFinalStateException();
+        }
 
         invite.setState(InviteState.CONFIRMED);
 
@@ -163,21 +167,23 @@ public class ExternalInviteService {
         return person;
     }
 
+    private boolean inFinalState(Invite invite) {
+        return invite.getState() == InviteState.CONFIRMED || invite.getState() == InviteState.REJECTED;
+    }
+
     private void sendConfirmationMessage(Invite invite, Person person) {
         String bcc = invite.getEmail();
 
         String subject =
                 messageSource.getMessage("external.user.confirmation.message.subject", new Object[] {}, I18N.getLocale());
 
-        //TODO: fix link
-        String link = "https://id.ist.utl.pt";
+        String passRecoveryLink = ExternalInviteConfiguration.getConfiguration().getPassRecoveryLink();
 
         String body =
-                messageSource
-                        .getMessage("external.user.confirmation.message.body", new Object[] {
-                                invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(),
-                                link, invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm"), person.getUsername() }, I18N.getLocale());
+                messageSource.getMessage("external.user.confirmation.message.body", new Object[] {
+                        invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(),
+                        passRecoveryLink, invite.getPeriod().getStart().toString("dd-MM-YYY"),
+                        invite.getPeriod().getEnd().toString("dd-MM-YYY"), person.getUsername() }, I18N.getLocale());
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -187,7 +193,11 @@ public class ExternalInviteService {
     }
 
     @Atomic(mode = TxMode.WRITE)
-    public void rejectInvite(Invite invite) {
+    public void rejectInvite(Invite invite) throws ChangeInviteFinalStateException {
+
+        if (inFinalState(invite)) {
+            throw new ChangeInviteFinalStateException();
+        }
 
         invite.setState(InviteState.REJECTED);
         sendRejectionMessage(invite);
@@ -199,11 +209,10 @@ public class ExternalInviteService {
         String subject = messageSource.getMessage("external.user.rejection.message.subject", new Object[] {}, I18N.getLocale());
 
         String body =
-                messageSource.getMessage(
-                        "external.user.rejection.message.body",
-                        new Object[] { invite.getCreator().getProfile().getFullName(), getInstitutionName(),
-                                invite.getReasonName(), invite.getPeriod().getStart().toString("dd-MM-YYY HH:mm"),
-                                invite.getPeriod().getEnd().toString("dd-MM-YYY HH:mm") }, I18N.getLocale());
+                messageSource.getMessage("external.user.rejection.message.body", new Object[] {
+                        invite.getCreator().getProfile().getFullName(), getInstitutionName(), invite.getReasonName(),
+                        invite.getPeriod().getStart().toString("dd-MM-YYY"), invite.getPeriod().getEnd().toString("dd-MM-YYY") },
+                        I18N.getLocale());
 
         System.out.println("Bcc: " + bcc);
         System.out.println("Subj: " + subject);
@@ -250,7 +259,7 @@ public class ExternalInviteService {
 
         Set<Unit> researchUnitsRoot =
                 Bennu.getInstance().getInstitutionUnit().getSubUnits().stream()
-                        .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
+                .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
 
         if (researchUnitsRoot.size() == 1) {
             return researchUnitsRoot.iterator().next().getAllSubUnits().stream()

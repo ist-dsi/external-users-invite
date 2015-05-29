@@ -12,6 +12,11 @@ public class ExternalInviteConfiguration {
         @ConfigurationProperty(key = "external.invite.expiration.days", description = "External invite expiration time in days",
                 defaultValue = "30")
         public Integer getExpirationDays();
+
+        @ConfigurationProperty(key = "external.invite.recovery.password.link",
+                description = "URL for getting password after the user has confirmed the invite",
+                defaultValue = "https://id.ist.utl.pt")
+        public String getPassRecoveryLink();
     }
 
     public static ConfigurationProperties getConfiguration() {

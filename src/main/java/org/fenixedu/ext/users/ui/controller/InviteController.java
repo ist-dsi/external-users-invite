@@ -14,6 +14,7 @@ import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ext.users.ExternalInviteConfiguration;
 import org.fenixedu.ext.users.domain.Invite;
 import org.fenixedu.ext.users.ui.bean.InviteBean;
+import org.fenixedu.ext.users.ui.exception.ChangeInviteFinalStateException;
 import org.fenixedu.ext.users.ui.exception.UnauthorisedUserException;
 import org.fenixedu.ext.users.ui.service.ExternalInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,8 +131,6 @@ public class InviteController {
         try {
             service.checkInviteAccess(invite);
 
-            //TODO: check state
-
             Person person = service.confirmInvite(invite);
 
             redirectAttrs.addFlashAttribute(
@@ -143,6 +142,9 @@ public class InviteController {
         } catch (UnauthorisedUserException e) {
             redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getClass().getSimpleName()));
             return "redirect:/external-users-invite";
+        } catch (ChangeInviteFinalStateException e) {
+            redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getClass().getSimpleName()));
+            return "redirect:/external-users-invite";
         }
     }
 
@@ -151,8 +153,6 @@ public class InviteController {
 
         try {
             service.checkInviteAccess(invite);
-
-            //TODO: check state
 
             service.rejectInvite(invite);
 
@@ -163,6 +163,9 @@ public class InviteController {
 
             return "redirect:/external-users-invite";
         } catch (UnauthorisedUserException e) {
+            redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getClass().getSimpleName()));
+            return "redirect:/external-users-invite";
+        } catch (ChangeInviteFinalStateException e) {
             redirectAttrs.addFlashAttribute("errors", Arrays.asList(e.getClass().getSimpleName()));
             return "redirect:/external-users-invite";
         }
