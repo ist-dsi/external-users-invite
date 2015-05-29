@@ -259,7 +259,7 @@ public class ExternalInviteService {
 
         Set<Unit> researchUnitsRoot =
                 Bennu.getInstance().getInstitutionUnit().getSubUnits().stream()
-                .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
+                        .filter(u -> u.getName().equals("Unidades Investigação")).collect(Collectors.toSet());
 
         if (researchUnitsRoot.size() == 1) {
             return researchUnitsRoot.iterator().next().getAllSubUnits().stream()
