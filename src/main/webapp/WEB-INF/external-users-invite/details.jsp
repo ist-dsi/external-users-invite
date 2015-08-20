@@ -7,7 +7,7 @@
 </div>
 
 <h3>
-  <spring:message code='title.invite'/>: ${invite.fullName}
+  <spring:message code='title.invite'/>: ${invite.fullName} <small>${invite.email}</small>
   <c:if test="${invite.state == 'NOT_COMPLETED'}">
     <span class="label label-default">${invite.state.localizedName}</span>
   </c:if>
